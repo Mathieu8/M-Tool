@@ -28,6 +28,7 @@ public interface BasicMeasurements extends java.io.Serializable {
 	 * This method should return all the data in the class in an orderly fashion so
 	 * it can be enter straight into DB, in one query.
 	 * 
+	 * 
 	 * @return String array with all the data in it
 	 * @warning the data that this method returns should be in the same order as the
 	 *          getFields() method.

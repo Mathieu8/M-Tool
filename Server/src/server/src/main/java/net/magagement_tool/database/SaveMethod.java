@@ -159,7 +159,7 @@ public class SaveMethod {
 	public void save(String nameTable, String[] nameField, String[] data, int UID) throws SQLException {
 		StringBuilder queryTemp = new StringBuilder();
 		for (int i = 0; i < nameField.length; i++) {
-			queryTemp.append( nameField[i] +" = '" + data[i] + "'");
+			queryTemp.append(nameField[i] + " = '" + data[i] + "'");
 			if (i < nameField.length - 1) {
 				queryTemp.append(',');
 			}

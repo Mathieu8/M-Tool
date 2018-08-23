@@ -8,11 +8,9 @@ import javafx.scene.layout.VBox;
 
 /**
  * a generic ComboBox is made here. An String array is required to start it, as
- * this will be the text that will appear
- * <br><br>
- * only the actionComboBox() needs to be overridden to use this interface
- * 
- *
+ * this will be the text that will appear. <br>
+ * <br>
+ * only the actionComboBox() needs to be overridden to use this interface.
  * 
  * @author mathieu
  * @version 08/23/2018
@@ -20,12 +18,11 @@ import javafx.scene.layout.VBox;
 
 public interface Dropdown {
 
-	
 	/**
 	 * a basic comboBox is created with this method.
 	 * 
-	 * @param s - String array with all the elements you want in the comboBox
-	 * @return comboBox<String> 
+	 * @param s - String array with all the elements you want in the comboBox.
+	 * @return comboBox<String>
 	 */
 	public default ComboBox<String> dropDownVBox(String[] s) {
 		ComboBox<String> dropdownBox = new ComboBox<>();
@@ -45,10 +42,10 @@ public interface Dropdown {
 	}
 
 	/**
-	 * This method need to be overridden to use the comboBox created above
+	 * This method need to be overridden to use the comboBox created above.
 	 * 
-	 * @param oldValue -  the value the comboBox was before it was changed. Is still needed?
-	 * @param newValue - the new value of the comboBox
+	 * @param oldValue - the value the comboBox was before it was changed.
+	 * @param newValue - the new value of the comboBox.
 	 */
 	public void actionComboBox(String oldValue, String newValue);
 }

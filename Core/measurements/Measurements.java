@@ -4,9 +4,9 @@ import java.time.LocalDateTime;
 
 /**
  * A simple example of Measurements class, later it should be increased to a
- * complete Measurements.
+ * complete Measurements. <br><br>
  * 
- * Most setters should also auto increase their counter here.
+ * setters should also auto increase their counter here.
  * 
  * @TODO TODO setters also save a timestamp
  * @author Mathieu

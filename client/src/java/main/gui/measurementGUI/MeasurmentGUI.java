@@ -63,8 +63,7 @@ public class MeasurmentGUI extends Application {
 	/**
 	 * this method set the obj reference correctly in this and all the other class that are used in MeasurmentGUI
 	 * to use later
-	 * 
-	 * @param obj
+	 * @param UID - it might be used later 
 	 */
 	public void setUID(int UID) {
 		m = new Measurements(UID, LocalDateTime.now());

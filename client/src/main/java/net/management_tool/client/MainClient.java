@@ -8,10 +8,8 @@ import src.java.main.gui.measurementGUI.MeasurmentGUI;
 /**
  * Here start the clientside of the app. <br>
  * <br>
- * right now (08/07/2018) it doesn't do too much. It starts with making a
- * Measurement m and a MeasurementGUI begin. and secondly it passes Measurement
- * m to the GUI and start the GUI
- * 
+ * right now (08/23/2018) it doesn't do too much. It starts with making a
+ * MeasurementGUI begin. and secondly it starts the GUI
  * 
  * @author Thijs
  * @author Mathieu
@@ -28,8 +26,8 @@ public class MainClient {
 	 */
 	public static void main(String[] args) {
 		int UID = 1;
-		//LocalDateTime dt = LocalDateTime.now();
-		//Measurements m = new Measurements(UID, dt);
+		// LocalDateTime dt = LocalDateTime.now();
+		// Measurements m = new Measurements(UID, dt);
 		MeasurmentGUI begin = new MeasurmentGUI();
 
 		begin.setUID(UID);
