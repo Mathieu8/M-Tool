@@ -5,4 +5,4 @@
  * @author Mathieu
  *
  */
-package gui.measurementGUI;
+package src.java.main.gui.measurementGUI;

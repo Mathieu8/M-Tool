@@ -1,6 +1,9 @@
-package gui.measurementGUI;
+package src.java.main.gui.measurementGUI;
 
 import java.util.Arrays;
+
+import javafx.application.Platform;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import measurements.Measurements;
@@ -8,11 +11,9 @@ import measurements.Measurements;
 /**
  * 
  * 
- * hier wordt een rijdtje met knopjes met daarop de smileys gemaakt
- * 
- * bij aan passing zorg er voor dat text als tooltip even veel elementen hebben.
  * 
  * @author mathieu
+ * @version 08/23/2018
  *
  */
 
@@ -24,17 +25,19 @@ public class Smileys implements src.java.main.gui.elements.Buttons, src.java.mai
 	String[] tooltip = { "blij", "boos", "bang", "bedroefd", "beschaamd" };
 	boolean disable = true;
 	VBox SIBox = new VBox();
-	// IntensiteitTest slider = new IntensiteitTest();
-	// Intensiteit intensiteit = new Intensiteit(disable);
-	// SliderInterface test = new SlinterInterface();
+	VBox sliderBox = new VBox();
 
-	public void action(String emotie) {
+	public void actionButton(String emotie) {
 		m.setEmotion(tooltip[Arrays.asList(text).indexOf(emotie)]);
+		disable = false;
+		Platform.runLater(() -> {
+			sliderBox.setDisable(disable);
+		});
 
 	}
 
 	public VBox smileys() {
-		SIBox.getChildren().addAll(smileysHBox(), SliderBox()); // slider.intensiteitTestBox(disable));
+		SIBox.getChildren().addAll(smileysHBox(), sliderVBox());
 		return SIBox;
 	}
 
@@ -55,15 +58,22 @@ public class Smileys implements src.java.main.gui.elements.Buttons, src.java.mai
 
 	public static void setMeasurement(Measurements obj) {
 		m = obj;
-
 	}
 
 	@Override
 	public void action(int newValue) {
 		m.setIntesitity(newValue);
-		System.out.println("value of the slider" + newValue);
+		System.out.println(" value of the intesity slider " + newValue);
 		// TODO Auto-generated method stub
 
+	}
+
+	private VBox sliderVBox() {
+		Label text = new Label("hoe intessief is je gevoel?");
+		sliderBox.getChildren().addAll(text, SliderBox());
+		sliderBox.setDisable(disable);
+
+		return sliderBox;
 	}
 
 }

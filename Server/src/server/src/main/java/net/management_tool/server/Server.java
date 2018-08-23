@@ -76,7 +76,11 @@ public class Server extends Application {
 	class HandleAClient implements Runnable {
 		private Socket socket; // A connected socket
 
-		/** Construct a thread */
+		/**
+		 * Construct a thread
+		 * 
+		 * @param socket
+		 */
 		public HandleAClient(Socket socket) {
 			this.socket = socket;
 		}

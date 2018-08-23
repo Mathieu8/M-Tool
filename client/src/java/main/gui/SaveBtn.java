@@ -13,7 +13,9 @@ import src.java.main.client.toServer.ToServer;
  * This class makes a button, that if pressed all the data will be sent to the
  * server to be handled
  * 
+ * @TODO TODO this class should implement Buttons interface.
  * @author mathieu
+ *  @version 08/23/2018
  */
 
 public class SaveBtn {

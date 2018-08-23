@@ -3,42 +3,52 @@ package src.java.main.gui.elements;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
 /**
- * @author mathieu
+ * a generic ComboBox is made here. An String array is required to start it, as
+ * this will be the text that will appear
+ * <br><br>
+ * only the actionComboBox() needs to be overridden to use this interface
+ * 
  *
- *         generieke ComboBox of een dropdown menutje
  * 
- *         als je het gebruikt vergeet niet om de changed te veranderen en aan
- *         de dropdown toe te voegen.
- * 
- *         Ik heb bij de eventhandlers een controle ingebouwd momenteel om zeker
- *         van te zijn dat hij de goede pakt en niet een verkeerde
+ * @author mathieu
+ * @version 08/23/2018
  */
 
-public class Dropdown {
-	ComboBox<String> dropdownBox;
+public interface Dropdown {
 
-	public ComboBox<String> returnDropdownBox() {
-		dropdownBox = new ComboBox<>();
+	
+	/**
+	 * a basic comboBox is created with this method.
+	 * 
+	 * @param s - String array with all the elements you want in the comboBox
+	 * @return comboBox<String> 
+	 */
+	public default ComboBox<String> dropDownVBox(String[] s) {
+		ComboBox<String> dropdownBox = new ComboBox<>();
+		for (int i = 0; i < s.length; i++) {
+			dropdownBox.getItems().add(s[i]);
+		}
+
+		dropdownBox.valueProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue ov, String oldValue, String newValue) {
+				actionComboBox(oldValue, newValue);
+
+			}
+
+		});
 		return dropdownBox;
 	}
 
-	public void addItem(String s) {
-		dropdownBox.getItems().add(s);
-	}
-
-	{
-		dropdownBox.valueProperty().addListener(new ChangeListener<String>() {
-			@Override
-			public void changed(ObservableValue ov, String t, String t1) {
-				System.out.print("niet goed in dropdown");
-				System.out.println(t);
-				System.out.print("niet goed in dropdown");
-				System.out.println(t1);
-				// TODO toSave the data
-			}
-		});
-	}
-
+	/**
+	 * This method need to be overridden to use the comboBox created above
+	 * 
+	 * @param oldValue -  the value the comboBox was before it was changed. Is still needed?
+	 * @param newValue - the new value of the comboBox
+	 */
+	public void actionComboBox(String oldValue, String newValue);
 }

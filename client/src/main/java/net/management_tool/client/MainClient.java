@@ -2,8 +2,8 @@ package src.main.java.net.management_tool.client;
 
 import java.time.LocalDateTime;
 
-import gui.measurementGUI.MeasurmentGUI;
 import measurements.Measurements;
+import src.java.main.gui.measurementGUI.MeasurmentGUI;
 
 /**
  * Here start the clientside of the app. <br>
@@ -15,7 +15,7 @@ import measurements.Measurements;
  * 
  * @author Thijs
  * @author Mathieu
- * @version 08/07/2018
+ * @version 08/23/2018
  * 
  *
  */

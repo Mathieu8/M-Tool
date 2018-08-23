@@ -1,4 +1,4 @@
-package gui.measurementGUI;
+package src.java.main.gui.measurementGUI;
 
 import java.time.LocalDateTime;
 
@@ -12,9 +12,12 @@ import measurements.Measurements;
 import src.java.main.gui.SaveBtn;
 
 /**
- * this class makes a simple GUI, with just the save button.
+ * This class makes a GUI for the measurement in the Core. So this is the place
+ * where everything is accessed thru. As it initialized all the small parts like
+ * the buttons, dropdown box and sliders.
  * 
  * @author Mathieu
+ * @version 08/23/2018
  *
  */
 public class MeasurmentGUI extends Application {
@@ -26,6 +29,7 @@ public class MeasurmentGUI extends Application {
 	SaveBtn saveButton = new SaveBtn();
 	Smileys smileys = new Smileys();
 	Activity activity = new Activity();
+	Productivity productivity = new Productivity();
 
 	/**
 	 * @param args
@@ -41,7 +45,8 @@ public class MeasurmentGUI extends Application {
 
 		VBox layout = new VBox();
 		// HBox saveBtn = saveButton.saveBtn();
-		layout.getChildren().addAll(smileys.smileys(), activity.activiteitVBox(), saveButton.saveBtn());
+		layout.getChildren().addAll(smileys.smileys(), activity.activiteitVBox(), productivity.prodSlider(),
+				saveButton.saveBtn());
 
 		root.getChildren().add(layout);
 		// root.getChildren().add(saveBtn);
@@ -54,23 +59,19 @@ public class MeasurmentGUI extends Application {
 		stage.show();
 
 	}
-	
-	
 
 	/**
-	 * this method set the obj reference correctly in this and the saveButton class
+	 * this method set the obj reference correctly in this and all the other class that are used in MeasurmentGUI
 	 * to use later
 	 * 
 	 * @param obj
 	 */
 	public void setUID(int UID) {
-		m = new Measurements(UID,LocalDateTime.now());
+		m = new Measurements(UID, LocalDateTime.now());
 		Smileys.setMeasurement(m);
 		Activity.setM(m);
+		Productivity.setMeasurement(m);
 		saveButton.setObject(m);
 	}
-	
-	
-	
-	
+
 }

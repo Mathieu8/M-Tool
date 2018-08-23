@@ -4,14 +4,19 @@ import javafx.scene.control.Slider;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
 
+/**
+ * An interface for all the sliders. the size of this slider is 256. <br><br>
+ * right now it goes from from red to yellow to green, but we might need to
+ * change that later
+ * 
+ * @author Mathieu
+ * @version 08/23/2018
+ */
 public interface SliderInterface {
-	// public int number;
-	// public Slider slider;
-
-	/*
-	 * de methode getSlider heeft boolean parameter, zodat intensiteit kan in voor
-	 * en na dat een emotie gekozen is gekozen, de zelfde slider class gebruiken
-	 */
+/**
+ * the main method of this interface, as it will created the slider. the range of this slider is 256.
+ * @return Slider 
+ */
 	public default Slider Sliders() {
 		double maxNumber = java.lang.Math.pow(2, 8) - 1;
 		Slider sliderTemp = new Slider(0, maxNumber, maxNumber / 2 + 0.5);
@@ -20,7 +25,6 @@ public interface SliderInterface {
 		sliderTemp.setShowTickMarks(true);
 		sliderTemp.setMajorTickUnit(maxNumber / 2);
 		sliderTemp.setMinorTickCount(0);
-		sliderTemp.setDisable(enable());
 
 		sliderTemp.setLabelFormatter(new StringConverter<Double>() {
 			@Override
@@ -51,26 +55,24 @@ public interface SliderInterface {
 
 		sliderTemp.setBlockIncrement(20);
 		sliderTemp.setSnapToTicks(false);
-		sliderTemp.valueProperty().addListener((e) -> action((int) sliderTemp.getValue()));// .addListener(this::changed);
+		sliderTemp.valueProperty().addListener((e) -> {
+			int value = (int) sliderTemp.getValue();
+			action(value);
+		});// .addListener(this::changed);
 
 		return sliderTemp;
 	}
 
-	default boolean enable() {
-		return false;
-	}
-
+	/**
+	 * 
+	 * @return a VBox with in it a slider
+	 */
 	public default VBox SliderBox() {
 		VBox temp = new VBox();
-		temp.getChildren().addAll(Sliders());
+		temp.getChildren().add(Sliders());
 
 		return temp;
 	}
-	/*
-	 * @Override public void changed(ObservableValue<? extends Number> prop, Number
-	 * oldValue, Number newValue) { int number = (int) sliderTemp.getValue();
-	 * System.out.print("niet goed in sliders "); System.out.println(number); }
-	 */
 
 	public void action(int newValue);
 }

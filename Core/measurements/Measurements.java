@@ -6,20 +6,29 @@ import java.time.LocalDateTime;
  * A simple example of Measurements class, later it should be increased to a
  * complete Measurements.
  * 
- * Most set-methods should also auto increase their counter here. 
+ * Most setters should also auto increase their counter here.
  * 
+ * @TODO TODO setters also save a timestamp
  * @author Mathieu
- * @version 08/07/2018
+ * @version 08/23/2018
  *
  */
 public class Measurements implements BasicMeasurements {
 	private int UID;
 	private LocalDateTime BeginDateTime;
-	long beginTime, endTime, duration;
-	String emotion;
-	int emotionCounter;
-	int intesitity;
-	int intesitityCounter;
+	private long beginTime, endTime, duration;
+
+	private String emotion;
+	private int emotionCounter;
+
+	private int intesitity = 127;
+	private int intesitityCounter;
+
+	private String activity;
+	private int activityCounter;
+
+	private int productivity;
+	private int productivityCounter;
 
 	public Measurements(int UID, LocalDateTime dt) {
 		this.UID = UID;
@@ -39,27 +48,20 @@ public class Measurements implements BasicMeasurements {
 
 	@Override
 	public String[] getFields() {
-		String[] temp = { "dateTime", "duration", "emotion", "emotionCounter", "intesitity", "intesitityCounter" };
+		String[] temp = { "dateTime", "duration", "emotion", "emotionCounter", "intesitity", "intesitityCounter",
+				"activity", "activityCounter", "productivity", "productivityCounter" };
 		return temp;
 	}
 
 	@Override
 	public String[] getData() {
 		String[] temp = { BeginDateTime.toString(), "" + duration, emotion, "" + emotionCounter, "" + intesitity,
-				"" + intesitityCounter };
+				"" + intesitityCounter, activity, "" + activityCounter, "" + productivity, "" + productivityCounter };
 		return temp;
-	}
-
-	public LocalDateTime getBeginDateTime() {
-		return BeginDateTime;
 	}
 
 	public void setBeginDateTime(LocalDateTime beginDateTime) {
 		BeginDateTime = beginDateTime;
-	}
-
-	public String getEmotion() {
-		return emotion;
 	}
 
 	public void setEmotion(String emotion) {
@@ -69,29 +71,23 @@ public class Measurements implements BasicMeasurements {
 
 	}
 
-	public int getIntesitity() {
-		return intesitity;
-	}
-
 	public void setIntesitity(int intesitity) {
 		intesitityCounter++;
 		this.intesitity = intesitity;
-	}
-
-	public int getUID() {
-		return UID;
 	}
 
 	public void setUID(int uID) {
 		UID = uID;
 	}
 
-	public String getDt() {
-		return BeginDateTime.toString();
+	public void setActivity(String activity) {
+		this.activity = activity;
+		activityCounter++;
 	}
 
-	public void setDt(LocalDateTime dt) {
-		this.BeginDateTime = dt;
+	public void setProductivity(int productivity) {
+		this.productivity = productivity;
+		productivityCounter++;
 	}
 
 }
