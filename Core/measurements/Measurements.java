@@ -6,14 +6,18 @@ import java.time.LocalDateTime;
  * A simple example of Measurements class, later it should be increased to a
  * complete Measurements. <br><br>
  * 
- * setters should also auto increase their counter here.
+ * setters should also auto increase their counter here.<br><br>
  * 
- * @TODO TODO setters also save a timestamp
+ * <b> TODO</b> setters also save a timestamp
  * @author Mathieu
  * @version 08/23/2018
  *
  */
 public class Measurements implements BasicMeasurements {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private int UID;
 	private LocalDateTime BeginDateTime;
 	private long beginTime, endTime, duration;

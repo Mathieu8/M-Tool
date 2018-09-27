@@ -29,9 +29,9 @@ public interface BasicMeasurements extends java.io.Serializable {
 	 * it can be enter straight into DB, in one query.
 	 * 
 	 * 
-	 * @return String array with all the data in it
-	 * @warning the data that this method returns should be in the same order as the
+	 * <br><br><b> WARNING</b> the data that this method returns should be in the same order as the
 	 *          getFields() method.
+	 * @return String array with all the data in it
 	 * 
 	 */
 	public abstract String[] getData();
