@@ -29,7 +29,7 @@ import src.server.database.SaveMethod;
  * 
  * 
  * @author Mathieu
- * @version 08/07/2018
+ * @version 09/27/2018
  *
  */
 public class Server extends Application {
@@ -131,7 +131,7 @@ public class Server extends Application {
 				// e.printStackTrace();
 			}catch(EOFException e) {
 				System.out.println("probably someone closed the client, so EOFException at the readObject() line");
-				e.printStackTrace();
+				//e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (ClassNotFoundException e) {

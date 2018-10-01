@@ -16,8 +16,6 @@ public class ToServer {
 	 */
 	public void sendToServer(Object o) {
 		try (ObjectOutputStream toServer = new ObjectOutputStream(new Socket(host, 8000).getOutputStream())) {
-				//Socket socket = new Socket(host, 8000)) {
-			//ObjectOutputStream toServer = new ObjectOutputStream(socket.getOutputStream());
 			toServer.writeObject(o);
 		} catch (IOException e) {
 			System.out.println("error");
