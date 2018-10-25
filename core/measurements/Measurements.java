@@ -2,18 +2,26 @@ package measurements;
 
 import java.time.LocalDateTime;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
+import version.Version;
+
 /**
  * A simple example of Measurements class, later it should be increased to a
- * complete Measurements. <br><br>
+ * complete Measurements. <br>
+ * <br>
  * 
- * setters should also auto increase their counter here.<br><br>
+ * setters should also auto increase their counter here.<br>
+ * <br>
  * 
  * <b> TODO</b> setters also save a timestamp
+ * 
  * @author Mathieu
  * @version 08/23/2018
  *
  */
-public class Measurements implements BasicMeasurements {
+public class Measurements extends Version implements BasicMeasurements {
 	/**
 	 * 
 	 */
@@ -43,6 +51,11 @@ public class Measurements implements BasicMeasurements {
 	public void setDuraction() {
 		endTime = System.currentTimeMillis();
 		duration = endTime - beginTime;
+	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 	}
 
 	@Override

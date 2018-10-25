@@ -9,21 +9,27 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 
 import measurements.BasicMeasurements;
+import src.server.database.connection.ConnectionToDB;
 
 /**
  * 
  * This interface has all the default methods that are needed to connected to
- * the DB<br><br>
+ * the DB<br>
+ * <br>
  * 
  * <b> TODO</b> Should the save methods also require a preparedStatement as
- *       parameter?
+ * parameter?
  * 
  * @author mathieu
  * @version 08/07/2018
  */
 
-public class SaveMethod {
-	private Connection conn;
+public class SaveMethod extends ConnectionToDB{
+	ConnectionToDB conn = null;
+
+	public SaveMethod(ConnectionToDB conn) {
+		this.conn = conn;
+	}
 
 	/**
 	 * This constructor takes an object that implements the interface
@@ -37,15 +43,13 @@ public class SaveMethod {
 	 * 
 	 * @param BasicMeasurements
 	 */
-	public SaveMethod(BasicMeasurements bm) {
+	public void SaveData(BasicMeasurements bm) {
 		String nameDB = bm.getTableName();
 		String[] dataFields = bm.getFields();
 		String[] data = bm.getData();
 		try {
-			createConn();
 			int ID = createUID(nameDB);
 			save(nameDB, dataFields, data, ID);
-			closeConn();
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -65,14 +69,6 @@ public class SaveMethod {
 	 *                             been exceeded and has at least tried to cancel
 	 *                             the current database connection attempt
 	 */
-	public void createConn() throws SQLException {
-		String dbName = "jdbc:mysql:";
-		String server = "//ict-stadsbrug.nl?";
-		String user = "user=smt&";
-		String pw = "password=12345";
-		conn = DriverManager.getConnection(dbName + server + user + pw);
-
-	}
 
 	/**
 	 * Creates a new row in the nameDB, with all the values set to NULL, later we
@@ -88,20 +84,23 @@ public class SaveMethod {
 	public int createUID(String nameTable) throws SQLException {
 
 		String query = "INSERT INTO smtdb." + nameTable + "  values ()";
+		System.out.println(conn.searchIntDB(query).get(0));
+		System.out.println();
+		int UID = conn.searchIntDB(query).get(0);
 
-		Statement st = conn.createStatement();
-		st.execute(query, Statement.RETURN_GENERATED_KEYS);
-		int UID = -1;
-
-		ResultSet rs = st.getGeneratedKeys();
-
-		System.out.println(rs.getRow());
-		if (rs.next()) {
-			UID = rs.getInt(1);
-		} else {
-			// throw an exception from here
-			System.out.println("somthing went wrong");
-		}
+//		Statement st = conn.createStatement();
+//		st.execute(query, Statement.RETURN_GENERATED_KEYS);
+//		int UID = -1;
+//
+//		ResultSet rs = st.getGeneratedKeys();
+//
+//		System.out.println(rs.getRow());
+//		if (rs.next()) {
+//			UID = rs.getInt(1);
+//		} else {
+//			// throw an exception from here
+//			System.out.println("somthing went wrong");
+//		}
 
 		return UID;
 	}
@@ -168,25 +167,12 @@ public class SaveMethod {
 		String query = "UPDATE `smtdb`.`" + nameTable + "` SET " + queryTemp + " WHERE  ID = " + UID + ";";
 		System.out.println(query);
 
-		PreparedStatement st = conn.prepareStatement(query);
+		conn.excuteStamenet(query);
+//		PreparedStatement st = conn.prepareStatement(query);
 
-		@SuppressWarnings("unused")
-		int insertedRecordsCount = st.executeUpdate();
-		st.close();
-
-	}
-
-	/**
-	 * does what it's name suggest, closes the connection to the database
-	 * 
-	 * @param conn
-	 * @return Connection that is closed
-	 * @throws SQLException - SQLException if a database access error occurs
-	 * 
-	 */
-	public Connection closeConn() throws SQLException {
-		conn.close();
-		return conn;
+//		@SuppressWarnings("unused")
+//		int insertedRecordsCount = st.executeUpdate();
+//		st.close();
 
 	}
 

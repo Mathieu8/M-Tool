@@ -11,7 +11,10 @@ package measurements;
 public interface BasicMeasurements extends java.io.Serializable {
 
 	/**
+	 * 
+	 * @TODO TODO may go away
 	 * @return the name of the DB table the data should go into
+	 * @deprecated
 	 */
 	public abstract String getTableName();
 
@@ -19,7 +22,9 @@ public interface BasicMeasurements extends java.io.Serializable {
 	 * This method should return all the data in the class in an orderly fashion so
 	 * it can be enter straight into DB, in one query
 	 * 
+	 * @TODO TODO may go away
 	 * @return String array with all the datafields 
+	 * @deprecated
 	 * 
 	 */
 	public abstract String[] getFields();
@@ -36,5 +41,6 @@ public interface BasicMeasurements extends java.io.Serializable {
 	 */
 	public abstract String[] getData();
 	
+	//public abstract String[] getDataa();
 	public abstract void setDuraction();
 }

@@ -67,8 +67,7 @@ public class SaveBtn {
 	 */
 	private void toSave() {
 		obj.setDuraction();
-		ToServer ts = new ToServer();
-		ts.sendToServer(obj);
+		ToServer.sendToServer(obj);
 		MeasurmentGUI.stage.hide();
 	}
 	
