@@ -11,7 +11,7 @@ public class Test {
 		t.deleteFile();
 		t.createFile("token test");
 
-		System.out.println("printing Token + meta data " + t.getToken());
+//		System.out.println("printing Token + meta data " + t.getToken());
 
 	}
 
@@ -26,7 +26,7 @@ public class Test {
 	}
 
 	public String getToken() {
-		return t.getToken();
+		return t.getToken().toString();
 	}
 
 }

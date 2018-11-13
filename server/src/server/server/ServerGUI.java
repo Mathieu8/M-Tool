@@ -1,7 +1,7 @@
 package src.server.server;
 
-
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -14,10 +14,7 @@ import javafx.stage.Stage;
 public class ServerGUI extends Application {
 	Server server = null;
 	// Text area for displaying contents
-	TextArea ta = new TextArea();
-
-	// Number a client
-	private int clientNo = 0;
+	static TextArea ta = new TextArea();
 
 	@Override // Override the start method in the Application class
 	public void start(Stage primaryStage) {
@@ -45,11 +42,18 @@ public class ServerGUI extends Application {
 
 		server = new Server(this);
 		server.runServer();
-		
+
 	}
-	
+
 	public static void main(String[] args) {
 		launch(args);
-		
+
 	}
+
+	public static void print(String s) {
+		Platform.runLater(() -> {
+			ta.appendText(s + '\n');
+		});
+	}
+
 }

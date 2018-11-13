@@ -8,6 +8,11 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.CharBuffer;
+import java.sql.Array;
+import java.util.Optional;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 import java.util.zip.ZipOutputStream;
 
 import javafx.application.Platform;
@@ -45,15 +50,21 @@ public class ToServer {
 	private void sendObject(Object o) {
 
 		try {
-			objectToServer = new ObjectOutputStream(socket.getOutputStream());
-			if (sendToken()) {
+			Socket objectSocket = new Socket(host, 8001);
+			objectToServer = new ObjectOutputStream(objectSocket.getOutputStream());
+			token = new DataOutputStream(socket.getOutputStream());
+			input = new DataInputStream(socket.getInputStream());
+			if (sendToken(token, input)) {
+				token.writeUTF("BasicMeasurements");
 				Platform.runLater(() -> {
-					GUI.welcome.appendText("Sleeping ");
+					GUI.welcome.appendText("sending \"BasicMeasurements\" " + '\n');
 				});
+				token.flush();
 				Platform.runLater(() -> {
-					GUI.welcome.appendText("waking " + '\n');
+					GUI.welcome.appendText("send \"BasicMeasurements\" " + '\n');
 				});
-
+				Thread.sleep(500);
+				
 				Platform.runLater(() -> {
 					GUI.welcome.appendText("sending object " + '\n');
 				});
@@ -63,28 +74,95 @@ public class ToServer {
 		} catch (IOException e) {
 			System.out.println("error");
 			e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-
 	}
 
-	private boolean sendToken() {
+	protected boolean sendToken(DataOutputStream token, DataInputStream input) {
 
 		try {
-				token = new DataOutputStream(socket.getOutputStream());
-				input = new DataInputStream(socket.getInputStream());
-			Login login = new Login();
-			final String s = login.getToken();
-			System.out.print(s);
+			Login login = Login.loginEntry();
+			char[] s = login.getToken();
 
-			Platform.runLater(() -> {
-				GUI.welcome.appendText("testing Token " + s + '\n');
-			});
-
-			token.writeUTF(s);
+			token.writeUTF("Token");
 			token.flush();
 
-			// s = null;
+			token.writeInt(s.length);
+//			CharBuffer.wrap(s).chars().forEach(i -> {
+//				try {
+//					token.writeChar(i);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			});
+
+			for (char c : s) {
+				token.writeChar(c);
+//				Platform.runLater(() -> {
+//					GUI.welcome.appendText("" + c);
+//				});
+			}
+//			Platform.runLater(() -> {
+//				GUI.welcome.appendText("\n");
+//			});
+
+			// token.writeUTF(s.toString());
+			token.flush();
+			s = null;
 			login = null;
+
+			String temp = input.readUTF();
+			if (temp.equals("Correct Token")) {
+//				Platform.runLater(() -> {
+//					GUI.welcome.appendText("Correct Token " + temp + '\n');
+//				});
+				return true;
+			} else {
+//				Platform.runLater(() -> {
+//					GUI.welcome.appendText(" incorrect Token " + temp + '\n');
+//				});
+				return false;
+
+			}
+		} catch (IOException e) {
+//			System.out.println("error");
+			// e.printStackTrace();
+		}
+		return false;
+	}
+
+	public boolean SendPW(String User, char[] pw) {
+		try {
+			token = new DataOutputStream(socket.getOutputStream());
+			input = new DataInputStream(socket.getInputStream());
+
+			token.writeUTF(User);
+			token.writeInt(pw.length);
+			CharBuffer.wrap(pw).chars().forEach(i -> {
+				try {
+					token.writeChar(i);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			});
+
+			for (char c : pw) {
+				token.writeChar(c);
+				Platform.runLater(() -> {
+					GUI.welcome.appendText("" + c);
+				});
+			}
+			Platform.runLater(() -> {
+				GUI.welcome.appendText("\n");
+			});
+
+			// token.writeUTF(s.toString());
+			token.flush();
+			pw = null;
 
 			String temp = input.readUTF();
 			if (temp.equals("Correct Token")) {
@@ -100,16 +178,16 @@ public class ToServer {
 
 			}
 		} catch (IOException e) {
-			System.out.println("error");
+//			System.out.println("error");
 			// e.printStackTrace();
 		}
 		return false;
 	}
-	
+
 	public static void sendToServer(Object o) {
 		ToServer ts = new ToServer();
 		ts.sendObject(o);
-		
+
 	}
 
 }

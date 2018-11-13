@@ -24,8 +24,10 @@ import src.server.database.connection.ConnectionToDB;
  * @version 08/07/2018
  */
 
-public class SaveMethod extends ConnectionToDB{
-	ConnectionToDB conn = null;
+public class SaveMethod {
+	private ConnectionToDB conn = null;
+	BasicMeasurements bm = null;
+	int sessionID;
 
 	public SaveMethod(ConnectionToDB conn) {
 		this.conn = conn;
@@ -43,32 +45,19 @@ public class SaveMethod extends ConnectionToDB{
 	 * 
 	 * @param BasicMeasurements
 	 */
-	public void SaveData(BasicMeasurements bm) {
+	public void SaveData(BasicMeasurements bm, int sessionID) {
+		this.bm = bm;
+		this.sessionID = sessionID;
 		String nameDB = bm.getTableName();
-		String[] dataFields = bm.getFields();
-		String[] data = bm.getData();
 		try {
-			int ID = createUID(nameDB);
-			save(nameDB, dataFields, data, ID);
+//			int ID = createUID(nameDB);
+			save(nameDB);
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
-	/**
-	 * This method creates a Connection to SMTDB. After that all methods within the
-	 * SaveMethod class can use it
-	 * 
-	 * 
-	 * @throws SQLException        - if a database access error occurs or the url is
-	 *                             null
-	 * @throws SQLTimeoutException - when the driver has determined that the timeout
-	 *                             value specified by the setLoginTimeout method has
-	 *                             been exceeded and has at least tried to cancel
-	 *                             the current database connection attempt
-	 */
 
 	/**
 	 * Creates a new row in the nameDB, with all the values set to NULL, later we
@@ -80,57 +69,14 @@ public class SaveMethod extends ConnectionToDB{
 	 * @return UID - int is the number primary key to the new row in the database,
 	 *         later it can be used to update that row and add new data to it
 	 * @throws SQLException
+	 * @deprecated
 	 */
 	public int createUID(String nameTable) throws SQLException {
 
 		String query = "INSERT INTO smtdb." + nameTable + "  values ()";
-		System.out.println(conn.searchIntDB(query).get(0));
-		System.out.println();
 		int UID = conn.searchIntDB(query).get(0);
 
-//		Statement st = conn.createStatement();
-//		st.execute(query, Statement.RETURN_GENERATED_KEYS);
-//		int UID = -1;
-//
-//		ResultSet rs = st.getGeneratedKeys();
-//
-//		System.out.println(rs.getRow());
-//		if (rs.next()) {
-//			UID = rs.getInt(1);
-//		} else {
-//			// throw an exception from here
-//			System.out.println("somthing went wrong");
-//		}
-
 		return UID;
-	}
-
-	/**
-	 * changes in the nameDB the timeStamp from NULL to the given value
-	 * 
-	 * @param conn
-	 * @param nameDB
-	 * @param UID
-	 * @param dateTime
-	 * @throws SQLException
-	 * @TODO TODO should we also add the name of the datafield as a parameter?
-	 * @deprecated Mathieu: I believe we should enter all via the same method, the
-	 *             one that takes String arrays
-	 */
-	public void save(Connection conn, String nameDB, int UID, Timestamp dateTime) throws SQLException {
-
-		String query = "UPDATE `smtdb`.`" + nameDB + "` SET `dateTime` = ' " + dateTime
-				+ "' WHERE `meetresultaat`.`ID` = " + UID + ";";
-		System.out.println(query);
-
-		PreparedStatement st = conn.prepareStatement(query);
-
-		@SuppressWarnings("unused")
-		int insertedRecordsCount = st.executeUpdate();
-		int t = st.executeBatch().length;
-		System.out.println(t);
-		st.close();
-
 	}
 
 	/**
@@ -140,8 +86,6 @@ public class SaveMethod extends ConnectionToDB{
 	 * 
 	 * @param conn      - Connection to the database
 	 * @param nameTable - name of the table the data should go into
-	 * @param UID       - int, this should be equal to the int that is returned from
-	 *                  createUID()
 	 * @param data      - a String Array with all the data in it
 	 * @param nameField - a String Array with all the names of the fields the data
 	 *                  should go into
@@ -155,24 +99,14 @@ public class SaveMethod extends ConnectionToDB{
 	 *                             Statement
 	 * 
 	 */
-	public void save(String nameTable, String[] nameField, String[] data, int UID) throws SQLException {
-		StringBuilder queryTemp = new StringBuilder();
-		for (int i = 0; i < nameField.length; i++) {
-			queryTemp.append(nameField[i] + " = '" + data[i] + "'");
-			if (i < nameField.length - 1) {
-				queryTemp.append(',');
-			}
-		}
+	public void save(String nameTable) throws SQLException {
+		String queryTemp = bm.getData().replaceAll("=", " = '").replaceAll(",", "',").replaceAll("<", "")
+				.replaceAll(">", "") + "', `session ID` = '" + sessionID+ '\'';
+		String query = "INSERT `smtdb`.`" + nameTable + "` SET " + queryTemp + ";";
 
-		String query = "UPDATE `smtdb`.`" + nameTable + "` SET " + queryTemp + " WHERE  ID = " + UID + ";";
 		System.out.println(query);
 
 		conn.excuteStamenet(query);
-//		PreparedStatement st = conn.prepareStatement(query);
-
-//		@SuppressWarnings("unused")
-//		int insertedRecordsCount = st.executeUpdate();
-//		st.close();
 
 	}
 

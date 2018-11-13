@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import src.gui.elements.Buttons;
 import src.gui.measurementGUI.MeasurmentGUI;
+import src.login.Login;
 
 /**
  * this class launches the javaFX application. <BR>
@@ -56,17 +57,13 @@ public class GUI extends Application implements Buttons {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
-		// doesn't work
-		// welcome.textProperty().addListener((observable, oldValue, newValue) -> {
-		// PauseTransition pause = new PauseTransition(Duration.seconds(2));
-		// pause.setOnFinished(event -> primaryStage.hide());
-		// pause.play();
-		// });
-
 		Duration d = // Duration.seconds(5); // seconds for testing
 				// d.add(Duration.minutes(50)); // minutes for use
 				Duration.INDEFINITE; // so it never launches during testing
 		measurmentGUI = measurment.initialized();
+		
+//		System.out.println(Login.loginEntry().tokenValid());
+		
 		Timeline fiveSecondsWonder = new Timeline(new KeyFrame(d, new EventHandler<ActionEvent>() {
 
 			@Override
@@ -96,6 +93,10 @@ public class GUI extends Application implements Buttons {
 		measurment.reset(1);
 
 		measurmentGUI.show();
+	}
+	
+	boolean checkLogin() {
+		return false;
 	}
 
 }

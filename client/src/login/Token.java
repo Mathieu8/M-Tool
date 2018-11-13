@@ -9,28 +9,30 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Token {
 //	File file = new File("token.txt");
 	// Files f = new Files();
 	private Path p = Paths.get("C:\\Users\\Mathieu\\eclipse-workspace\\Javafx\\M-Tool\\client\\token.txt");
 
-	private String readFile() {
-		StringBuilder temp = new StringBuilder();
+	private List<Character> readFile() {
+		List<Character> temp = new ArrayList<>();
+//		StringBuilder temp = new StringBuilder();
 		try (InputStream in = new BufferedInputStream(Files.newInputStream(p))) {
 			int i = 0;
 			do {
 				i = in.read();
 				if (i != -1) {
-					temp.append((char) i);
+					temp.add((char) i);
 				}
 			} while (i != -1);
-			return temp.toString();
 
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return "";
+		return temp;
 
 	}
 
@@ -42,31 +44,30 @@ public class Token {
 		String[] data = new String[3];
 
 		try {
-//			System.out.println("get root " + p.getRoot());
-//			  System.out.println("Absolute path " + p.toAbsolutePath());
-//			  System.out.println("Absolute normalize path " + p.toAbsolutePath().normalize());
 			Object object = Files.getAttribute(p, "creationTime", LinkOption.NOFOLLOW_LINKS);
-//			System.out.println("Creation time: " + object);
 			data[0] = object.toString();
-//			object = Files.getAttribute(p, "lastModifiedTime", LinkOption.NOFOLLOW_LINKS);
-//			System.out.println("Last modified time: " + object);
 			data[1] = object.toString();
-
-//			object = Files.getAttribute(p, "dos:hidden", LinkOption.NOFOLLOW_LINKS);
 			data[2] = object.toString();
-//			System.out.println("isHidden: " + object);
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		return data;
 	}
-	
-	String getToken() {
-		String token = readFile();
+
+	char[] getToken() {
+		List<Character> token = readFile();
 		String[] meta = getMetadata();
-		return token + " " + meta[1]; 
+		for (int i = 0; i < meta[1].length(); i++) {
+			token.add(meta[1].charAt(i));
+		}
+
+		char[] temp = new char[token.size()];
+		for (int i = 0; i < token.size(); i++) {
+			temp[i] = token.get(i);
+		}
+
+		return temp;
 	}
 
 	void createFile(String s) {

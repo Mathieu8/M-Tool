@@ -26,7 +26,6 @@ public class Measurements extends Version implements BasicMeasurements {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int UID;
 	private LocalDateTime BeginDateTime;
 	private long beginTime, endTime, duration;
 
@@ -43,7 +42,7 @@ public class Measurements extends Version implements BasicMeasurements {
 	private int productivityCounter;
 
 	public Measurements(int UID, LocalDateTime dt) {
-		this.UID = UID;
+//		this.UID = UID;
 		this.BeginDateTime = dt;
 		beginTime = System.currentTimeMillis();
 	}
@@ -55,7 +54,10 @@ public class Measurements extends Version implements BasicMeasurements {
 
 	@Override
 	public String toString() {
-		return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+		
+		String temp = ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+		return (String) temp.subSequence(13, temp.length()-1);
+		
 	}
 
 	@Override
@@ -63,19 +65,8 @@ public class Measurements extends Version implements BasicMeasurements {
 		return "meetresultaat";
 	}
 
-	@Override
-	public String[] getFields() {
-		String[] temp = { "dateTime", "duration", "emotion", "emotionCounter", "intesitity", "intesitityCounter",
-				"activity", "activityCounter", "productivity", "productivityCounter" };
-		return temp;
-	}
 
-	@Override
-	public String[] getData() {
-		String[] temp = { BeginDateTime.toString(), "" + duration, emotion, "" + emotionCounter, "" + intesitity,
-				"" + intesitityCounter, activity, "" + activityCounter, "" + productivity, "" + productivityCounter };
-		return temp;
-	}
+	
 
 	public void setBeginDateTime(LocalDateTime beginDateTime) {
 		BeginDateTime = beginDateTime;
@@ -94,7 +85,7 @@ public class Measurements extends Version implements BasicMeasurements {
 	}
 
 	public void setUID(int uID) {
-		UID = uID;
+//		UID = uID;
 	}
 
 	public void setActivity(String activity) {
