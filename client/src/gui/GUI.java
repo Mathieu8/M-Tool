@@ -34,6 +34,7 @@ import src.login.Login;
 public class GUI extends Application implements Buttons {
 	static MeasurmentGUI measurment;
 	static Stage measurmentGUI;
+	static Stage main = null;
 	public static TextArea welcome;
 
 	@Override
@@ -57,13 +58,13 @@ public class GUI extends Application implements Buttons {
 		primaryStage.setScene(scene);
 		primaryStage.show();
 
-		Duration d = // Duration.seconds(5); // seconds for testing
-				// d.add(Duration.minutes(50)); // minutes for use
-				Duration.INDEFINITE; // so it never launches during testing
+		Duration d = Duration.seconds(5); // seconds for testing
+		// d.add(Duration.minutes(50)); // minutes for use
+//				Duration.INDEFINITE; // so it never launches during testing
 		measurmentGUI = measurment.initialized();
-		
-//		System.out.println(Login.loginEntry().tokenValid());
-		
+
+//		Login.loginEntry().tokenValid();
+
 		Timeline fiveSecondsWonder = new Timeline(new KeyFrame(d, new EventHandler<ActionEvent>() {
 
 			@Override
@@ -82,6 +83,56 @@ public class GUI extends Application implements Buttons {
 
 	}
 
+	public Stage initialize() {
+		if (main == null) {
+			main = new Stage();
+			welcome = new TextArea();
+			measurment = new MeasurmentGUI();
+			// Label welcome = new Label("Welcome");
+
+			Platform.setImplicitExit(false);
+			String test = "test";
+			StackPane root = new StackPane();
+			HBox btn = new HBox();
+			btn.getChildren().add(buttons(test, test));
+			VBox vb = new VBox();
+			vb.getChildren().addAll(btn, welcome);
+			root.getChildren().addAll(vb);
+
+			Scene scene = new Scene(root, 300, 250);
+
+			main.setScene(scene);
+			main.setTitle("Self Management Tool");
+
+			Duration d = // Duration.seconds(5); // seconds for testing
+					// d.add(Duration.minutes(50)); // minutes for use
+					Duration.INDEFINITE; // so it never launches during testing
+			measurmentGUI = measurment.initialized();
+
+//		Login.loginEntry().tokenValid();
+
+			Timeline fiveSecondsWonder = new Timeline(new KeyFrame(d, new EventHandler<ActionEvent>() {
+
+				@Override
+				public void handle(ActionEvent event) {
+					Platform.runLater(() -> {
+						welcome.appendText("this is called every " + d + " on UI thread" + '\n');
+					});
+					measurment.setUID(1);
+					measurment.reset(1);
+					measurmentGUI.show();
+				}
+			}));
+			fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
+			fiveSecondsWonder.play();
+		}
+		return main;
+	}
+
+	public void showStage() {
+		main.show();
+	}
+
 	public void startGUI(String[] args) {
 		Application.launch(args);
 	}
@@ -94,9 +145,19 @@ public class GUI extends Application implements Buttons {
 
 		measurmentGUI.show();
 	}
-	
+
 	boolean checkLogin() {
 		return false;
+	}
+
+	public static void print(String s) {
+		System.out.println(s);
+
+		if (main != null) {
+			Platform.runLater(() -> {
+				GUI.welcome.appendText(s + '\n');
+			});
+		}
 	}
 
 }

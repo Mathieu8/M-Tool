@@ -1,5 +1,11 @@
 package src.login;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.net.Socket;
+
 import javafx.application.Platform;
 import src.gui.GUI;
 import src.toServer.ToServer;
@@ -42,13 +48,20 @@ public class Login extends ToServer {
 
 	public boolean tokenValid() {
 		System.out.println("in tokenValid()");
-//		if (sendToken()) {
-//			System.out.println("Token Valid " + '\n');
-//			return true;
-//		} else {
-//			System.out.println("Token inValid " + '\n');
-			return false;
-//		}
+		try(Socket socket = new Socket(host, 8002);
+				DataOutputStream token = new DataOutputStream(socket.getOutputStream());
+				DataInputStream input = new DataInputStream(socket.getInputStream())){
+			if (sendToken(token, input)) {
+				System.out.println("Token Valid " + '\n');
+				return true;
+			} else {
+				System.out.println("Token inValid " + '\n');
+				return false;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
-
 }

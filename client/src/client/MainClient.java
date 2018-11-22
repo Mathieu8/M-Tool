@@ -1,6 +1,7 @@
 package src.client;
 
 import src.gui.GUI;
+import src.gui.WelcomeGUI;
 
 /**
  * Here start the clientside of the app. <br>
@@ -24,8 +25,10 @@ public class MainClient {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		GUI begin = new GUI();
+		WelcomeGUI begin = new WelcomeGUI();
 		begin.startGUI(args);
+//		GUI gui = new GUI();
+//		gui.startGUI(args);
 	}
 	
 	

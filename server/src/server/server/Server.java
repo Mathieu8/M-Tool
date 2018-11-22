@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -32,10 +33,7 @@ import version.Version;
  */
 public class Server {
 
-	ServerGUI gui = null;
-
-	public Server(ServerGUI gui) {
-		this.gui = gui;
+	public Server() {
 	}
 
 	// Number a client
@@ -45,9 +43,9 @@ public class Server {
 		new Thread(() -> {
 			try {
 				// Create a server socket
-				ServerSocket serverSocket = new ServerSocket(8000);
+				ServerSocket serverSocket = new ServerSocket(8002);
 				ServerSocket objectServerSocket = new ServerSocket(8001);
-				gui.ta.appendText("MultiThreadServer started at " + new Date() + '\n');
+				ServerGUI.print("MultiThreadServer started at " + new Date());
 
 				while (true) {
 					// Listen for a new connection request
@@ -57,19 +55,16 @@ public class Server {
 					// Increment clientNo
 					clientNo++;
 
-					Platform.runLater(() -> {
-						// Display the client number
-						gui.ta.appendText("Starting thread for client " + clientNo + " at " + new Date() + '\n');
+					// Display the client number
+					ServerGUI.print("Starting thread for client " + clientNo + " at " + new Date());
+					ServerGUI.print("Amount of Threads active " + Thread.activeCount());
 
-						// Find the client's host name, and IP address
-						InetAddress inetAddress = socket.getInetAddress();
-						InetAddress inetAddressO = objectSocket.getInetAddress();
-						gui.ta.appendText("Client " + clientNo + "'s host name is " + inetAddress.getHostName() + "\n");
-						gui.ta.appendText(
-								"Client " + clientNo + "'s IP Address is " + inetAddress.getHostAddress() + "\n");
-						gui.ta.appendText("Object Client " + clientNo + "'s IP Address is "
-								+ inetAddressO.getHostAddress() + "\n");
-					});
+					// Find the client's host name, and IP address
+					InetAddress inetAddress = socket.getInetAddress();
+					InetAddress inetAddressO = objectSocket.getInetAddress();
+					ServerGUI.print("Client " + clientNo + "'s host name is " + inetAddress.getHostName());
+					ServerGUI.print("Client " + clientNo + "'s IP Address is " + inetAddress.getHostAddress());
+					ServerGUI.print("Object Client " + clientNo + "'s IP Address is " + inetAddressO.getHostAddress());
 
 					// Create and start a new thread for the connection
 					new Thread(new HandleAClient(socket, objectSocket)).start();
@@ -84,135 +79,138 @@ public class Server {
 	class HandleAClient implements Runnable {
 		private Socket socket; // A connected socket
 		private Socket objectSocket; // A connected socket
-		ConnectionToDB conn = null;
+		final ConnectionToDB conn = ConnectionToDB.createConn();
+		String threadName;
 
 		/**
 		 * Construct a thread
 		 * 
 		 * @param socket
+		 * @param objectSocket
 		 */
 		public HandleAClient(Socket socket, Socket objectSocket) {
 			this.socket = socket;
 			this.objectSocket = objectSocket;
+			ServerGUI.print("in HandleClient()");
+
 		}
 
 		/** Run a thread */
 		public void run() {
-			conn = ConnectionToDB.createConn();
+			threadName = Thread.currentThread().getName();
+			ServerGUI.print(threadName + " in run()");
+//			 ConnectionToDB.createConn();
+//			ServerGUI.print("after ConnectionToDB.createConn()");
 			// Create data input and output streams
 			try (DataInputStream input = new DataInputStream(socket.getInputStream());
 					DataOutputStream output = new DataOutputStream(socket.getOutputStream());
-					ObjectInputStream inputFromClient = new ObjectInputStream(objectSocket.getInputStream())) {
+					ObjectInputStream inputFromClient = new ObjectInputStream(objectSocket.getInputStream());) {
 
+				Optional<Integer> sessionID = Optional.empty();
 				outer: while (true) {
+					ServerGUI.print("\n" + threadName + " running while again \n");
+
+					ServerGUI.print(threadName + " waiting for option");
 					String option = input.readUTF();
-					ServerGUI.print("option is " + option);
-					Optional<Integer> sessionID = Optional.empty();
+					ServerGUI.print(threadName + " option is " + option);
 					switch (option) {
 					case "Token":
-						ServerGUI.print("in token");
+						ServerGUI.print(threadName + " in token");
 						sessionID = checkToken(input, output);
 						break;
 					case "Password":
-						ServerGUI.print("in password");
+						ServerGUI.print(threadName + " in password");
 						sessionID = checkPW(input, output);
 						break;
 					case "BasicMeasurements":
-						ServerGUI.print("in measurements");
-						saveMeasurement(sessionID,inputFromClient);
+						ServerGUI.print(threadName + " in measurements");
+						saveMeasurement(sessionID, inputFromClient);
 						break outer;
+					default:
+						ServerGUI.print(threadName + "not an valid option: " + option);
 					}
-					ServerGUI.print("\n");
 
 				}
-//			Thread.interrupted();
-			} catch (SocketException e) {
-//				 System.out.println("IOException");
-
+			} catch (ClassNotFoundException | IOException e) {
+				ServerGUI.print("Error " + e);
 				e.printStackTrace();
-			} catch (EOFException e) {
-//				 System.out.println("IOException");
 
-				e.printStackTrace();
-			} catch (IOException e) {
-
-				// System.out.println("IOException");
-
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				// TODO Auto-generated catch block
-//				e.printStackTrace();
 			} finally {
+				ServerGUI.print(threadName + " number of active threads: " + Thread.activeCount());
 
+				ServerGUI.print(threadName + " interrupting thread");
 				Thread.interrupted();
 			}
 		}
 
-	private Optional<Integer> checkToken(DataInputStream input, DataOutputStream output) throws IOException {
-		ConnectionToDB conn = ConnectionToDB.createConn();
-		CheckPW cpw = new CheckPW(conn);
+		private Optional<Integer> checkToken(DataInputStream input, DataOutputStream output) throws IOException {
+			ConnectionToDB conn = ConnectionToDB.createConn();
+			CheckPW cpw = new CheckPW(conn);
 
-		int length = input.readInt();
-		char[] c = new char[length];
-		for (int i = 0; i < length; i++) {
-			c[i] = input.readChar();
+			int length = input.readInt();
+			char[] c = new char[length];
+			for (int i = 0; i < length; i++) {
+				c[i] = input.readChar();
 //						ServerGUI.print(""+c[i]);
-		}
+			}
 
-		Optional<Integer> sessionID = Optional.ofNullable(null);
-		try {
-			sessionID = cpw.checkToken(c);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		c = null;
+			Optional<Integer> sessionID = Optional.ofNullable(null);
+			try {
+				sessionID = cpw.checkToken(c);
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			c = null;
 //		ServerGUI.print("checking version; " + Version.VERSION + '\n');
 //		ServerGUI.print("SessionID; " + sessionID + '\n');
 
-		if (sessionID.isPresent()) {
+			if (sessionID.isPresent()) {
 //			ServerGUI.print(" Correct token ");
-			output.writeUTF("Correct Token");
-			output.flush();
-			return sessionID;
-		} else {
+				output.writeUTF("Correct Token");
+				output.flush();
+				return sessionID;
+			} else {
 //			output.writeUTF("Wrong token");
-			output.flush();
-			ServerGUI.print(" wrong token");
-			return Optional.empty();
+				output.flush();
+				ServerGUI.print(" wrong token");
+				return Optional.empty();
 
+			}
 		}
-	}
 
-	private Optional<Integer> checkPW(DataInputStream input, DataOutputStream output) throws IOException {
-		ConnectionToDB conn = ConnectionToDB.createConn();
-		CheckPW cpw = new CheckPW(conn);
-		String username = input.readUTF();
-		int length = input.readInt();
-		char[] c = new char[length];
-		for (int i = 0; i < length; i++) {
-			c[i] = input.readChar();
+		private Optional<Integer> checkPW(DataInputStream input, DataOutputStream output) throws IOException {
+			ConnectionToDB conn = ConnectionToDB.createConn();
+			CheckPW cpw = new CheckPW(conn);
+			String username = input.readUTF();
+			int length = input.readInt();
+			char[] c = new char[length];
+			for (int i = 0; i < length; i++) {
+				c[i] = input.readChar();
 //						ServerGUI.print(""+c[i]);
+			}
+
+			// TODO Auto-generated method stub
+			return null;
 		}
 
-		// TODO Auto-generated method stub
-		return null;
-	}
+		private void saveMeasurement(Optional<Integer> sessionID, ObjectInputStream inputFromClient)
+				throws ClassNotFoundException, IOException {
+			if (sessionID.isPresent()) {
+				ServerGUI.print(threadName + " reading object");
+				// Continuously serve the client
+				BasicMeasurements object = (BasicMeasurements) inputFromClient.readObject();
+				ServerGUI.print(threadName + " read object");
 
-	private void saveMeasurement(Optional<Integer> sessionID, ObjectInputStream inputFromClient)
-			throws ClassNotFoundException, IOException {
-		if (sessionID.isPresent()) {
+				ServerGUI.print(threadName + " TableName received from client: " + object.getTableName());
+				ServerGUI.print(threadName + " first item in the data set: " + object.toString());
 
-			// Continuously serve the client
-			BasicMeasurements object = (BasicMeasurements) inputFromClient.readObject();
-
-			Platform.runLater(() -> {
-				gui.ta.appendText("TableName received from client: " + object.getTableName() + '\n');
-				gui.ta.appendText("first item in the data set: " + object.toString() + '\n');
-			});
-
-			SaveMethod sm = new SaveMethod(conn);
-			sm.SaveData(object, sessionID.get());
+				SaveMethod sm = new SaveMethod(conn);
+				sm.SaveData(object, sessionID.get());
+			} else {
+				throw new IllegalArgumentException(
+						"Optional<Ineger> sessionID is required. please make sure it pass thru the password check or token test");
+			}
 		}
 	}
-}}
+}

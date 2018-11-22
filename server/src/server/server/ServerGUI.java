@@ -40,7 +40,7 @@ public class ServerGUI extends Application {
 		primaryStage.setScene(scene); // Place the scene in the stage
 		primaryStage.show(); // Display the stage
 
-		server = new Server(this);
+		server = new Server();
 		server.runServer();
 
 	}
@@ -51,6 +51,8 @@ public class ServerGUI extends Application {
 	}
 
 	public static void print(String s) {
+		System.out.println(s);
+		
 		Platform.runLater(() -> {
 			ta.appendText(s + '\n');
 		});

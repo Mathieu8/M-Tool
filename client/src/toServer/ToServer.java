@@ -25,113 +25,88 @@ import version.Version;
  * @version 09/27/2018
  */
 public class ToServer {
-	static String host = "localhost";
-	private Socket socket;
-	private ObjectOutputStream objectToServer = null;
-	private DataOutputStream token = null;
-	private DataInputStream input = null;
+	protected static String host = "localhost";
+//	private Socket socket;
+//	private ObjectOutputStream objectToServer = null;
+//	private DataOutputStream token = null;
+//	private DataInputStream input = null;
 
 	public ToServer() {
-		try {
-			socket = new Socket(host, 8000);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		
 	}
 
 	/**
 	 * 
 	 * @param o - object that will be send to the server
 	 */
-	private void sendObject(Object o) {
+	private void sendObject( Object o) {
+		GUI.print("");
+		GUI.print("in sendObject()");
+		GUI.print("");
 
-		try {
-			Socket objectSocket = new Socket(host, 8001);
-			objectToServer = new ObjectOutputStream(objectSocket.getOutputStream());
-			token = new DataOutputStream(socket.getOutputStream());
-			input = new DataInputStream(socket.getInputStream());
-			if (sendToken(token, input)) {
+		try(Socket socket = new Socket(host, 8002);
+				Socket objectSocket = new Socket(host, 8001);
+				ObjectOutputStream objectToServer = new ObjectOutputStream(objectSocket.getOutputStream());
+				DataOutputStream token = new DataOutputStream(socket.getOutputStream());
+				DataInputStream input = new DataInputStream(socket.getInputStream())){
+		
+			boolean test = sendToken(token, input);
+			GUI.print("sendToken(token, input) = " + test);
+			if (test) {
+
+				GUI.print("sending option = \"BasicMeasurements\" ");
 				token.writeUTF("BasicMeasurements");
-				Platform.runLater(() -> {
-					GUI.welcome.appendText("sending \"BasicMeasurements\" " + '\n');
-				});
 				token.flush();
-				Platform.runLater(() -> {
-					GUI.welcome.appendText("send \"BasicMeasurements\" " + '\n');
-				});
-				Thread.sleep(500);
-				
-				Platform.runLater(() -> {
-					GUI.welcome.appendText("sending object " + '\n');
-				});
+				GUI.print("sended \"BasicMeasurements\" ");
+				Thread.sleep(100);
+
+				GUI.print("sending object ");
+				GUI.print(o.toString());
 				objectToServer.writeObject(o);
 				objectToServer.flush();
 			}
-		} catch (IOException e) {
+		} catch (IOException | InterruptedException e) {
 			System.out.println("error");
 			e.printStackTrace();
-		} catch (InterruptedException e) {
+//		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+//			e.printStackTrace();
 		}
 	}
 
-	protected boolean sendToken(DataOutputStream token, DataInputStream input) {
+	protected boolean sendToken(DataOutputStream token, DataInputStream input) throws IOException {
 
-		try {
-			Login login = Login.loginEntry();
-			char[] s = login.getToken();
+		Login login = Login.loginEntry();
+		char[] s = login.getToken();
 
-			token.writeUTF("Token");
-			token.flush();
+		GUI.print("sending option = \"Token\"");
+		token.writeUTF("Token");
+		token.flush();
+		GUI.print("sended option = \"Token\"");
 
-			token.writeInt(s.length);
-//			CharBuffer.wrap(s).chars().forEach(i -> {
-//				try {
-//					token.writeChar(i);
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			});
+		
+		GUI.print("sending token");
+		token.writeInt(s.length);
 
-			for (char c : s) {
-				token.writeChar(c);
-//				Platform.runLater(() -> {
-//					GUI.welcome.appendText("" + c);
-//				});
-			}
-//			Platform.runLater(() -> {
-//				GUI.welcome.appendText("\n");
-//			});
-
-			// token.writeUTF(s.toString());
-			token.flush();
-			s = null;
-			login = null;
-
-			String temp = input.readUTF();
-			if (temp.equals("Correct Token")) {
-//				Platform.runLater(() -> {
-//					GUI.welcome.appendText("Correct Token " + temp + '\n');
-//				});
-				return true;
-			} else {
-//				Platform.runLater(() -> {
-//					GUI.welcome.appendText(" incorrect Token " + temp + '\n');
-//				});
-				return false;
-
-			}
-		} catch (IOException e) {
-//			System.out.println("error");
-			// e.printStackTrace();
+		for (char c : s) {
+			token.writeChar(c);
 		}
-		return false;
+
+		token.flush();
+		GUI.print("sended token");
+		s = null;
+		login = null;
+
+		GUI.print("waiting for conformation of the token");
+
+		String temp = input.readUTF();
+		if (temp.equals("Correct Token")) {
+			GUI.print("temp = " + temp);
+			return true;
+		} else {
+			GUI.print("temp = " + temp);
+			return false;
+		}
 	}
 
 	public boolean SendPW(String User, char[] pw) {
@@ -156,9 +131,7 @@ public class ToServer {
 					GUI.welcome.appendText("" + c);
 				});
 			}
-			Platform.runLater(() -> {
-				GUI.welcome.appendText("\n");
-			});
+			GUI.print("\n");
 
 			// token.writeUTF(s.toString());
 			token.flush();
@@ -166,14 +139,10 @@ public class ToServer {
 
 			String temp = input.readUTF();
 			if (temp.equals("Correct Token")) {
-				Platform.runLater(() -> {
-					GUI.welcome.appendText("Correct Token " + temp + '\n');
-				});
+				GUI.print("Correct Token " + temp + '\n');
 				return true;
 			} else {
-				Platform.runLater(() -> {
-					GUI.welcome.appendText(" incorrect Token " + temp + '\n');
-				});
+				GUI.print(" incorrect Token " + temp + '\n');
 				return false;
 
 			}
