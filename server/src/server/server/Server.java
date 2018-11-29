@@ -33,38 +33,42 @@ import version.Version;
  */
 public class Server {
 
-	public Server() {
-	}
+	
 
 	// Number a client
 	private int clientNo = 0;
 
 	public void runServer() {
+		var test = true;
 		new Thread(() -> {
 			try {
 				// Create a server socket
 				ServerSocket serverSocket = new ServerSocket(8002);
 				ServerSocket objectServerSocket = new ServerSocket(8001);
-				ServerGUI.print("MultiThreadServer started at " + new Date());
+				ServerGUI.print("#"+ clientNo +" MultiThreadServer started at " + new Date());
 
 				while (true) {
+					
+					ServerGUI.print("#"+ clientNo +" serverSocket.isClosed() " + serverSocket.isClosed());
+					
 					// Listen for a new connection request
 					Socket socket = serverSocket.accept();
 					Socket objectSocket = objectServerSocket.accept();
+					ServerGUI.print("#"+ clientNo +" Socket.isClosed() " + socket.isClosed());
 
 					// Increment clientNo
 					clientNo++;
 
 					// Display the client number
-					ServerGUI.print("Starting thread for client " + clientNo + " at " + new Date());
-					ServerGUI.print("Amount of Threads active " + Thread.activeCount());
+					ServerGUI.print("#"+ clientNo +" Starting thread for client " + clientNo + " at " + new Date());
+					ServerGUI.print("#"+ clientNo +" Amount of Threads active " + Thread.activeCount());
 
 					// Find the client's host name, and IP address
 					InetAddress inetAddress = socket.getInetAddress();
 					InetAddress inetAddressO = objectSocket.getInetAddress();
-					ServerGUI.print("Client " + clientNo + "'s host name is " + inetAddress.getHostName());
-					ServerGUI.print("Client " + clientNo + "'s IP Address is " + inetAddress.getHostAddress());
-					ServerGUI.print("Object Client " + clientNo + "'s IP Address is " + inetAddressO.getHostAddress());
+					ServerGUI.print("#"+ clientNo +" Client " + clientNo + "'s host name is " + inetAddress.getHostName());
+					ServerGUI.print("#"+ clientNo +" Client " + clientNo + "'s IP Address is " + inetAddress.getHostAddress());
+					ServerGUI.print("#"+ clientNo +" Object Client " + clientNo + "'s IP Address is " + inetAddressO.getHostAddress());
 
 					// Create and start a new thread for the connection
 					new Thread(new HandleAClient(socket, objectSocket)).start();
@@ -107,9 +111,11 @@ public class Server {
 					ObjectInputStream inputFromClient = new ObjectInputStream(objectSocket.getInputStream());) {
 
 				Optional<Integer> sessionID = Optional.empty();
+				
 				outer: while (true) {
 					ServerGUI.print("\n" + threadName + " running while again \n");
 
+					ServerGUI.print(threadName + " input.available(): " + input.available());
 					ServerGUI.print(threadName + " waiting for option");
 					String option = input.readUTF();
 					ServerGUI.print(threadName + " option is " + option);
@@ -126,6 +132,9 @@ public class Server {
 						ServerGUI.print(threadName + " in measurements");
 						saveMeasurement(sessionID, inputFromClient);
 						break outer;
+					case "Close":
+						ServerGUI.print(threadName + " Close");
+						break outer;
 					default:
 						ServerGUI.print(threadName + "not an valid option: " + option);
 					}
@@ -139,6 +148,7 @@ public class Server {
 				ServerGUI.print(threadName + " number of active threads: " + Thread.activeCount());
 
 				ServerGUI.print(threadName + " interrupting thread");
+				clientNo--;
 				Thread.interrupted();
 			}
 		}
@@ -166,12 +176,12 @@ public class Server {
 //		ServerGUI.print("SessionID; " + sessionID + '\n');
 
 			if (sessionID.isPresent()) {
-//			ServerGUI.print(" Correct token ");
+			ServerGUI.print(" Correct token ");
 				output.writeUTF("Correct Token");
 				output.flush();
 				return sessionID;
 			} else {
-//			output.writeUTF("Wrong token");
+			output.writeUTF("Wrong token");
 				output.flush();
 				ServerGUI.print(" wrong token");
 				return Optional.empty();

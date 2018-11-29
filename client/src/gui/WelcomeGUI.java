@@ -15,8 +15,9 @@ import javafx.util.Duration;
 import src.login.Login;
 
 public class WelcomeGUI extends Application {
-	private Login login = null;
+	private static Login login = null;
 	boolean loginValid = false;
+	Timeline fiveSecondsWonder;
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -34,7 +35,7 @@ public class WelcomeGUI extends Application {
 
 		Duration d = Duration.seconds(5); // seconds for testing
 
-		Timeline fiveSecondsWonder = new Timeline(new KeyFrame(d, new EventHandler<ActionEvent>() {
+		fiveSecondsWonder = new Timeline(new KeyFrame(d, new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
@@ -45,10 +46,13 @@ public class WelcomeGUI extends Application {
 					GUI gui = new GUI();
 					gui.initialize();
 					gui.showStage();
+					fiveSecondsWonder.stop();
+					primaryStage.hide();
 					
 				} else {
-					login = Login.loginEntry();
-					loginValid = login.tokenValid();
+//					login =
+							Login.loginEntry().tokenValid();
+//					loginValid = login.tokenValid();
 //					loginValid = true;
 					// show login Screen
 				}

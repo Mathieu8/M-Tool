@@ -47,21 +47,25 @@ public class Login extends ToServer {
 	}
 
 	public boolean tokenValid() {
+		boolean temp = false;
 		System.out.println("in tokenValid()");
-		try(Socket socket = new Socket(host, 8002);
+		try (Socket socket = new Socket(host, 8002);
 				DataOutputStream token = new DataOutputStream(socket.getOutputStream());
-				DataInputStream input = new DataInputStream(socket.getInputStream())){
+				DataInputStream input = new DataInputStream(socket.getInputStream())) {
+
 			if (sendToken(token, input)) {
-				System.out.println("Token Valid " + '\n');
-				return true;
+				System.out.println("Token Valid ");
+				temp = true;
 			} else {
-				System.out.println("Token inValid " + '\n');
-				return false;
+				System.out.println("Token inValid ");
+				temp = false;
 			}
+			
+			token.writeUTF("Close");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return false;
+		return temp;
 	}
 }
