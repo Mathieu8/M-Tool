@@ -110,9 +110,10 @@ public class ToServer {
 	}
 
 	public boolean SendPW(String User, char[] pw) {
-		try {
-			token = new DataOutputStream(socket.getOutputStream());
-			input = new DataInputStream(socket.getInputStream());
+		try (Socket socket = new Socket(host, 8002);
+				DataOutputStream token = new DataOutputStream(socket.getOutputStream());
+				DataInputStream input = new DataInputStream(socket.getInputStream())){
+			
 
 			token.writeUTF(User);
 			token.writeInt(pw.length);

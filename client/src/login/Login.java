@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
-import javafx.application.Platform;
 import src.gui.GUI;
 import src.toServer.ToServer;
 

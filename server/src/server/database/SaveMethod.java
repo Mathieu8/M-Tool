@@ -60,26 +60,6 @@ public class SaveMethod {
 	}
 
 	/**
-	 * Creates a new row in the nameDB, with all the values set to NULL, later we
-	 * can with the UID change the datafields to fill in the data.
-	 * 
-	 * @param conn      - connection to the database
-	 * @param nameTable - String that points this method to the right table where to
-	 *                  create a new row
-	 * @return UID - int is the number primary key to the new row in the database,
-	 *         later it can be used to update that row and add new data to it
-	 * @throws SQLException
-	 * @deprecated
-	 */
-	public int createUID(String nameTable) throws SQLException {
-
-		String query = "INSERT INTO smtdb." + nameTable + "  values ()";
-		int UID = conn.searchIntDB(query).get(0);
-
-		return UID;
-	}
-
-	/**
 	 * This method takes everything that is needed to create a prepareStatement. So
 	 * it starts by making one, and executing it. afterwards it closes the
 	 * prepareStatement.

@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 import src.server.database.connection.ConnectionToDB;
-import src.server.server.ServerGUI;
 
 public class CheckPW {
 	private ConnectionToDB conn = null;
@@ -38,11 +37,11 @@ public class CheckPW {
 		date = date.minusMonths(1);
 		StringBuilder query = new StringBuilder();
 		query.append("SELECT `ID` FROM `Session ID` WHERE `Token` = '");
-		query.append(Stream.of(token).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append));
+		//query.append(Stream.of(token).collect(StringBuilder::new, StringBuilder::append, StringBuilder::append));
 		query.append("'");
 //		query.append("' AND `last Login` <= '" + date + "'");
 
-		ServerGUI.print(query.toString());
+		System.out.println(query.toString());
 		try {
 		sessionID = Optional.of(conn.searchIntDB(query.toString()).get(0));
 		} catch( IndexOutOfBoundsException IOOB) {

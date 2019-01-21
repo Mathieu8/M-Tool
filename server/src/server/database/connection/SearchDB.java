@@ -8,7 +8,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import src.server.server.ServerGUI;
 
 public interface SearchDB {
 
@@ -39,7 +38,6 @@ public interface SearchDB {
 			ResultSet rs = st.executeQuery(query);
 //			ResultSet rs = st.getGeneratedKeys();
 			
-//			ServerGUI.print("" + rs.next());
 
 			int i = 1;
 			while (rs.next()) {

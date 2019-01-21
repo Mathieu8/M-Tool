@@ -1,8 +1,0 @@
-/**
- * 
- */
-/**
- * @author Mathieu
- *
- */
-package version;

@@ -33,42 +33,43 @@ import version.Version;
  */
 public class Server {
 
-	
-
 	// Number a client
 	private int clientNo = 0;
 
 	public void runServer() {
 		var test = true;
 		new Thread(() -> {
-			try {
-				// Create a server socket
-				ServerSocket serverSocket = new ServerSocket(8002);
-				ServerSocket objectServerSocket = new ServerSocket(8001);
-				ServerGUI.print("#"+ clientNo +" MultiThreadServer started at " + new Date());
+			try (
+					// Create a server socket
+					ServerSocket serverSocket = new ServerSocket(8002);
+					ServerSocket objectServerSocket = new ServerSocket(8001);) {
+				System.out.println("#" + clientNo + " MultiThreadServer started at " + new Date());
 
 				while (true) {
-					
-					ServerGUI.print("#"+ clientNo +" serverSocket.isClosed() " + serverSocket.isClosed());
-					
+
+					System.out.println("#" + clientNo + " serverSocket.isClosed() " + serverSocket.isClosed());
+
 					// Listen for a new connection request
 					Socket socket = serverSocket.accept();
 					Socket objectSocket = objectServerSocket.accept();
-					ServerGUI.print("#"+ clientNo +" Socket.isClosed() " + socket.isClosed());
+					System.out.println("#" + clientNo + " Socket.isClosed() " + socket.isClosed());
 
 					// Increment clientNo
 					clientNo++;
 
 					// Display the client number
-					ServerGUI.print("#"+ clientNo +" Starting thread for client " + clientNo + " at " + new Date());
-					ServerGUI.print("#"+ clientNo +" Amount of Threads active " + Thread.activeCount());
+					System.out.println("#" + clientNo + " Starting thread for client " + clientNo + " at " + new Date());
+					System.out.println("#" + clientNo + " Amount of Threads active " + Thread.activeCount());
 
 					// Find the client's host name, and IP address
 					InetAddress inetAddress = socket.getInetAddress();
 					InetAddress inetAddressO = objectSocket.getInetAddress();
-					ServerGUI.print("#"+ clientNo +" Client " + clientNo + "'s host name is " + inetAddress.getHostName());
-					ServerGUI.print("#"+ clientNo +" Client " + clientNo + "'s IP Address is " + inetAddress.getHostAddress());
-					ServerGUI.print("#"+ clientNo +" Object Client " + clientNo + "'s IP Address is " + inetAddressO.getHostAddress());
+					System.out.println(
+							"#" + clientNo + " Client " + clientNo + "'s host name is " + inetAddress.getHostName());
+					System.out.println("#" + clientNo + " Client " + clientNo + "'s IP Address is "
+							+ inetAddress.getHostAddress());
+					System.out.println("#" + clientNo + " Object Client " + clientNo + "'s IP Address is "
+							+ inetAddressO.getHostAddress());
 
 					// Create and start a new thread for the connection
 					new Thread(new HandleAClient(socket, objectSocket)).start();
@@ -95,59 +96,59 @@ public class Server {
 		public HandleAClient(Socket socket, Socket objectSocket) {
 			this.socket = socket;
 			this.objectSocket = objectSocket;
-			ServerGUI.print("in HandleClient()");
+			System.out.println("in HandleClient()");
 
 		}
 
 		/** Run a thread */
 		public void run() {
 			threadName = Thread.currentThread().getName();
-			ServerGUI.print(threadName + " in run()");
+			System.out.println(threadName + " in run()");
 //			 ConnectionToDB.createConn();
-//			ServerGUI.print("after ConnectionToDB.createConn()");
+//			System.out.println("after ConnectionToDB.createConn()");
 			// Create data input and output streams
 			try (DataInputStream input = new DataInputStream(socket.getInputStream());
 					DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 					ObjectInputStream inputFromClient = new ObjectInputStream(objectSocket.getInputStream());) {
 
 				Optional<Integer> sessionID = Optional.empty();
-				
-				outer: while (true) {
-					ServerGUI.print("\n" + threadName + " running while again \n");
 
-					ServerGUI.print(threadName + " input.available(): " + input.available());
-					ServerGUI.print(threadName + " waiting for option");
+				outer: while (true) {
+					System.out.println("\n" + threadName + " running while again \n");
+
+					System.out.println(threadName + " input.available(): " + input.available());
+					System.out.println(threadName + " waiting for option");
 					String option = input.readUTF();
-					ServerGUI.print(threadName + " option is " + option);
+					System.out.println(threadName + " option is " + option);
 					switch (option) {
 					case "Token":
-						ServerGUI.print(threadName + " in token");
+						System.out.println(threadName + " in token");
 						sessionID = checkToken(input, output);
 						break;
 					case "Password":
-						ServerGUI.print(threadName + " in password");
+						System.out.println(threadName + " in password");
 						sessionID = checkPW(input, output);
 						break;
 					case "BasicMeasurements":
-						ServerGUI.print(threadName + " in measurements");
+						System.out.println(threadName + " in measurements");
 						saveMeasurement(sessionID, inputFromClient);
 						break outer;
 					case "Close":
-						ServerGUI.print(threadName + " Close");
+						System.out.println(threadName + " Close");
 						break outer;
 					default:
-						ServerGUI.print(threadName + "not an valid option: " + option);
+						System.out.println(threadName + "not an valid option: " + option);
 					}
 
 				}
 			} catch (ClassNotFoundException | IOException e) {
-				ServerGUI.print("Error " + e);
+				System.out.println("Error " + e);
 				e.printStackTrace();
 
 			} finally {
-				ServerGUI.print(threadName + " number of active threads: " + Thread.activeCount());
+				System.out.println(threadName + " number of active threads: " + Thread.activeCount());
 
-				ServerGUI.print(threadName + " interrupting thread");
+				System.out.println(threadName + " interrupting thread");
 				clientNo--;
 				Thread.interrupted();
 			}
@@ -161,7 +162,7 @@ public class Server {
 			char[] c = new char[length];
 			for (int i = 0; i < length; i++) {
 				c[i] = input.readChar();
-//						ServerGUI.print(""+c[i]);
+//						System.out.println(""+c[i]);
 			}
 
 			Optional<Integer> sessionID = Optional.ofNullable(null);
@@ -172,18 +173,18 @@ public class Server {
 				e.printStackTrace();
 			}
 			c = null;
-//		ServerGUI.print("checking version; " + Version.VERSION + '\n');
-//		ServerGUI.print("SessionID; " + sessionID + '\n');
+//		System.out.println("checking version; " + Version.VERSION + '\n');
+//		System.out.println("SessionID; " + sessionID + '\n');
 
 			if (sessionID.isPresent()) {
-			ServerGUI.print(" Correct token ");
+				System.out.println(" Correct token ");
 				output.writeUTF("Correct Token");
 				output.flush();
 				return sessionID;
 			} else {
-			output.writeUTF("Wrong token");
+				output.writeUTF("Wrong token");
 				output.flush();
-				ServerGUI.print(" wrong token");
+				System.out.println(" wrong token");
 				return Optional.empty();
 
 			}
@@ -197,7 +198,7 @@ public class Server {
 			char[] c = new char[length];
 			for (int i = 0; i < length; i++) {
 				c[i] = input.readChar();
-//						ServerGUI.print(""+c[i]);
+//						System.out.println(""+c[i]);
 			}
 
 			// TODO Auto-generated method stub
@@ -207,13 +208,13 @@ public class Server {
 		private void saveMeasurement(Optional<Integer> sessionID, ObjectInputStream inputFromClient)
 				throws ClassNotFoundException, IOException {
 			if (sessionID.isPresent()) {
-				ServerGUI.print(threadName + " reading object");
+				System.out.println(threadName + " reading object");
 				// Continuously serve the client
 				BasicMeasurements object = (BasicMeasurements) inputFromClient.readObject();
-				ServerGUI.print(threadName + " read object");
+				System.out.println(threadName + " read object");
 
-				ServerGUI.print(threadName + " TableName received from client: " + object.getTableName());
-				ServerGUI.print(threadName + " first item in the data set: " + object.toString());
+				System.out.println(threadName + " TableName received from client: " + object.getTableName());
+				System.out.println(threadName + " first item in the data set: " + object.toString());
 
 				SaveMethod sm = new SaveMethod(conn);
 				sm.SaveData(object, sessionID.get());
