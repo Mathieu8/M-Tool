@@ -8,6 +8,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import src.server.server.ServerGUI;
+
 
 public interface SearchDB {
 
@@ -23,7 +25,7 @@ public interface SearchDB {
 				list.add(rs.getString(i++));
 			} else {
 				// throw an exception from here
-				System.out.println("somthing went wrong");
+				ServerGUI.print("somthing went wrong");
 				throw new SQLException();
 			}
 		}
@@ -52,7 +54,7 @@ public interface SearchDB {
 //
 //		ResultSet rs = st.getGeneratedKeys();
 //
-//		System.out.println(rs.getRow());
+//		ServerGUI.print(rs.getRow());
 //		if (rs.next()) {
 //			UID = rs.getInt(1);
 	}

@@ -33,14 +33,13 @@ public class WelcomeGUI extends Application {
 		primaryStage.show();
 
 
-		Duration d = Duration.seconds(5); // seconds for testing
+		Duration d = Duration.seconds(1); // seconds for testing
 
 		fiveSecondsWonder = new Timeline(new KeyFrame(d, new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("in TimeLine( in KeyFrame( handle )) ");
-				System.out.println(loginValid);
 
 				if (loginValid) {
 					GUI gui = new GUI();
@@ -50,11 +49,8 @@ public class WelcomeGUI extends Application {
 					primaryStage.hide();
 					
 				} else {
-//					login =
-							Login.loginEntry().tokenValid();
-//					loginValid = login.tokenValid();
-//					loginValid = true;
-					// show login Screen
+//					loginValid =true;// Login.loginEntry().tokenValid();
+					loginValid = Login.loginEntry().tokenValid();
 				}
 			}
 		}));

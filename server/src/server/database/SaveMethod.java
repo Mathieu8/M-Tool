@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 
 import measurements.BasicMeasurements;
 import src.server.database.connection.ConnectionToDB;
+import src.server.server.ServerGUI;
 
 /**
  * 
@@ -84,7 +85,7 @@ public class SaveMethod {
 				.replaceAll(">", "") + "', `session ID` = '" + sessionID+ '\'';
 		String query = "INSERT `smtdb`.`" + nameTable + "` SET " + queryTemp + ";";
 
-		System.out.println(query);
+		ServerGUI.print(query);
 
 		conn.excuteStamenet(query);
 

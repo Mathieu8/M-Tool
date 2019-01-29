@@ -15,7 +15,9 @@ import java.util.List;
 public class Token {
 //	File file = new File("token.txt");
 	// Files f = new Files();
-	private Path p = Paths.get("C:\\Users\\Mathieu\\eclipse-workspace\\Javafx\\M-Tool\\client\\token.txt");
+	private String filename = "token.txt";
+	private Path p = Paths.get(System.getProperty("user.dir"), filename);
+	// + "C:\\Users\\Mathieu\\eclipse-workspace\\M-Tool\\client\\token.txt");
 
 	private List<Character> readFile() {
 		List<Character> temp = new ArrayList<>();
@@ -40,13 +42,23 @@ public class Token {
 	 * 
 	 * @return
 	 */
-	private String[] getMetadata() {
+	public String[] getMetadata() {
 		String[] data = new String[3];
 
 		try {
 			Object object = Files.getAttribute(p, "creationTime", LinkOption.NOFOLLOW_LINKS);
 			data[0] = object.toString();
 			data[1] = object.toString();
+			StringBuilder temp = new StringBuilder();
+
+			for (int i = 0; i <= data[1].length(); i++) {
+				char c = data[1].charAt(i);
+				if (c == 'T') {
+					break;
+				}
+				temp.append(data[1].charAt(i));
+			}
+			data[1] = temp.toString();
 			data[2] = object.toString();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -57,10 +69,10 @@ public class Token {
 
 	char[] getToken() {
 		List<Character> token = readFile();
-		String[] meta = getMetadata();
-		for (int i = 0; i < meta[1].length(); i++) {
-			token.add(meta[1].charAt(i));
-		}
+//		String[] meta = getMetadata();
+//		for (int i = 0; i < meta[1].length(); i++) {
+//			token.add(meta[1].charAt(i));
+//		}
 
 		char[] temp = new char[token.size()];
 		for (int i = 0; i < token.size(); i++) {
