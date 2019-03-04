@@ -10,16 +10,15 @@ import java.util.List;
 
 import src.server.server.ServerGUI;
 
+public interface ReadDB extends PassConnection{
 
-public interface SearchDB {
-
-	public default List<String> searchStringDB(String query) throws SQLException {
+	public default List<String> readStringDB(String query) throws SQLException {
 		List<String> list = new ArrayList<String>();
 		if (checkConn()) {
 //			PreparedStatement st = getConnection().prepareStatement(query);
 			Statement st = getConnection().createStatement();
-			st.execute(query, Statement.RETURN_GENERATED_KEYS);
-			ResultSet rs = st.getGeneratedKeys();
+//			st.execute(query, Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs = st.executeQuery(query); // st.getGeneratedKeys();
 			int i = 1;
 			if (rs.next()) {
 				list.add(rs.getString(i++));
@@ -32,14 +31,13 @@ public interface SearchDB {
 		return list;
 	}
 
-	public default List<Integer> searchIntDB(String query) throws SQLException {
+	public default List<Integer> readIntDB(String query) throws SQLException {
 		List<Integer> list = new ArrayList<Integer>();
 		if (checkConn()) {
-			Statement st = getConnection().createStatement();
+			Statement st = getConnection().prepareStatement(query);
 //			Statement st = getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 			ResultSet rs = st.executeQuery(query);
 //			ResultSet rs = st.getGeneratedKeys();
-			
 
 			int i = 1;
 			while (rs.next()) {
@@ -58,8 +56,22 @@ public interface SearchDB {
 //		if (rs.next()) {
 //			UID = rs.getInt(1);
 	}
+	
+	public default List<Long> readLongDB(String query) throws SQLException{
+		List<Long> list = new ArrayList<Long>();
+		if (checkConn()) {
+			Statement st = getConnection().prepareStatement(query);
+//			Statement st = getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs = st.executeQuery(query);
+//			ResultSet rs = st.getGeneratedKeys();
 
-	Connection getConnection();
+			int i = 1;
+			while (rs.next()) {
+				list.add(rs.getLong(i++));
+			}
+		}
+		return list;
+	}
 
-	boolean checkConn() throws SQLException;
+
 }

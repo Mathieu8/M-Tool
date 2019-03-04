@@ -22,9 +22,6 @@ import version.Version;
  *
  */
 public class Measurements extends Version implements BasicMeasurements {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private LocalDateTime BeginDateTime;
 	private long beginTime, endTime, duration;
@@ -54,19 +51,14 @@ public class Measurements extends Version implements BasicMeasurements {
 
 	@Override
 	public String toString() {
-		
 		String temp = ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
 		return (String) temp.subSequence(13, temp.length()-1);
-		
 	}
 
 	@Override
 	public String getTableName() {
 		return "meetresultaat";
 	}
-
-
-	
 
 	public void setBeginDateTime(LocalDateTime beginDateTime) {
 		BeginDateTime = beginDateTime;
@@ -76,7 +68,6 @@ public class Measurements extends Version implements BasicMeasurements {
 		this.emotion = emotion;
 		emotionCounter++;
 		System.out.println("in measurements " + this.emotion);
-
 	}
 
 	public void setIntesitity(int intesitity) {
@@ -97,5 +88,4 @@ public class Measurements extends Version implements BasicMeasurements {
 		this.productivity = productivity;
 		productivityCounter++;
 	}
-
 }

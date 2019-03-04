@@ -1,11 +1,12 @@
 package src.server.database.connection;
 
+import java.nio.CharBuffer;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-public class ConnectionToDB implements SearchDB{
+public class ConnectionToDB implements CreateDB, ReadDB, UpdateDB, DeleteDB {
 	Connection conn = null;
 	static private ConnectionToDB connToDB;
 	private Long time = System.nanoTime();
@@ -37,8 +38,7 @@ public class ConnectionToDB implements SearchDB{
 			String pw = "12345";
 
 			try {
-//				connToDB.conn = DriverManager.getConnection(dbName + server + user + pw);
-				connToDB.conn = DriverManager.getConnection(dbName + server,  user , pw);
+				connToDB.conn = DriverManager.getConnection(dbName + server, user, pw);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -66,8 +66,6 @@ public class ConnectionToDB implements SearchDB{
 		}
 	}
 
-	
-
 	/**
 	 * does what it's name suggest, closes the connection to the database
 	 * 
@@ -88,6 +86,7 @@ public class ConnectionToDB implements SearchDB{
 		// TODO Auto-generated method stub
 		return conn;
 	}
+
 	
 
 }

@@ -82,7 +82,7 @@ public class Token {
 		return temp;
 	}
 
-	void createFile(String s) {
+	public void createFile(String s) {
 		byte data[] = s.getBytes();
 
 		try (OutputStream out = new BufferedOutputStream(Files.newOutputStream(p))) {
@@ -93,7 +93,7 @@ public class Token {
 		}
 	}
 
-	void deleteFile() {
+	public void deleteFile() {
 		try {
 			Files.delete(p);
 		} catch (IOException e) {

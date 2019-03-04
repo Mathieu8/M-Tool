@@ -28,25 +28,13 @@ import src.server.server.ServerGUI;
 public class SaveMethod {
 	private ConnectionToDB conn = null;
 	BasicMeasurements bm = null;
-	int sessionID;
+	Long sessionID;
 
+	
 	public SaveMethod(ConnectionToDB conn) {
 		this.conn = conn;
 	}
-
-	/**
-	 * This constructor takes an object that implements the interface
-	 * BasicMeasurements. First it takes the data from object with the methods from
-	 * the interface to be able to use them. <br />
-	 * <br />
-	 * 
-	 * After that it does a couple of things within the try block. In order: making
-	 * connection to the database, insert the data and than close the connection to
-	 * the database
-	 * 
-	 * @param BasicMeasurements
-	 */
-	public void SaveData(BasicMeasurements bm, int sessionID) {
+	public void SaveData(BasicMeasurements bm, Long sessionID) {
 		this.bm = bm;
 		this.sessionID = sessionID;
 		String nameDB = bm.getTableName();
@@ -83,11 +71,14 @@ public class SaveMethod {
 	public void save(String nameTable) throws SQLException {
 		String queryTemp = bm.getData().replaceAll("=", " = '").replaceAll(",", "',").replaceAll("<", "")
 				.replaceAll(">", "") + "', `session ID` = '" + sessionID+ '\'';
-		String query = "INSERT `smtdb`.`" + nameTable + "` SET " + queryTemp + ";";
+//		String query = "INSERT `smtdb`.`" + nameTable + "` SET " + queryTemp + ";";
+//		PreparedStatement st = 
+				conn.createDB(nameTable, queryTemp);
 
-		ServerGUI.print(query);
+		ServerGUI.print(queryTemp);
+//		st.execute();
 
-		conn.excuteStamenet(query);
+//		conn.excuteStamenet(query);
 
 	}
 

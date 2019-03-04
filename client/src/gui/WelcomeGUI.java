@@ -13,11 +13,21 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import src.login.Login;
+import src.login.LoginGUI;
 
 public class WelcomeGUI extends Application {
 	private static Login login = null;
 	boolean loginValid = false;
 	Timeline fiveSecondsWonder;
+	
+
+	public boolean isLoginValid() {
+		return loginValid;
+	}
+
+	public void setLoginValid(boolean loginValid) {
+		this.loginValid = loginValid;
+	}
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
@@ -49,8 +59,17 @@ public class WelcomeGUI extends Application {
 					primaryStage.hide();
 					
 				} else {
-//					loginValid =true;// Login.loginEntry().tokenValid();
+//					GUI gui = new GUI();
+//					gui.initialize();
+//					gui.showStage();
+//					fiveSecondsWonder.stop();
+//					primaryStage.hide();
+					fiveSecondsWonder.pause();
 					loginValid = Login.loginEntry().tokenValid();
+					LoginGUI login = new LoginGUI();
+					login.initialize();
+					login.show();
+					//test that PW is correct, if so show gui
 				}
 			}
 		}));

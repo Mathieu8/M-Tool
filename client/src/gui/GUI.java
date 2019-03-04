@@ -36,6 +36,7 @@ public class GUI extends Application implements Buttons {
 	static Stage measurmentGUI;
 	static Stage main = null;
 	public static TextArea welcome;
+	
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {

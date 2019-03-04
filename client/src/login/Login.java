@@ -52,10 +52,11 @@ public class Login extends ToServer {
 		
 
 			if (sendToken()) {
-				System.out.println("Token Valid ");
+				System.out.println("Token valid ");
 				temp = true;
 			} else {
-				System.out.println("Token inValid ");
+				System.out.println("Token invalid ");
+//				new LoginGUI().show();
 				temp = false;
 			}
 			

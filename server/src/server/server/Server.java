@@ -110,9 +110,9 @@ public class Server {
 			try (DataInputStream input = new DataInputStream(socket.getInputStream());
 					DataOutputStream output = new DataOutputStream(socket.getOutputStream());
 					ObjectInputStream inputFromClient = new ObjectInputStream(objectSocket.getInputStream());) {
-				socket.setSoTimeout(1000);
+				socket.setSoTimeout(100000);
 
-				Optional<Integer> sessionID = Optional.empty();
+				Optional<Long> sessionID = Optional.empty();
 
 				outer: while (true) {
 					ServerGUI.print("\n" + threadName + " running while again \n" + new Date());
@@ -155,7 +155,7 @@ public class Server {
 			}
 		}
 
-		private Optional<Integer> checkToken(DataInputStream input, DataOutputStream output) throws IOException {
+		private Optional<Long> checkToken(DataInputStream input, DataOutputStream output) throws IOException {
 			ServerGUI.print("In CheckToken");
 			ConnectionToDB conn = ConnectionToDB.createConn();
 			CheckPW cpw = new CheckPW(conn);
@@ -170,48 +170,73 @@ public class Server {
 			String date = input.readUTF();
 			ServerGUI.print("date is " + date);
 
-			Optional<Integer> sessionID = Optional.ofNullable(null);
+			Optional<Long> sessionID = Optional.ofNullable(null);
 			try {
 				sessionID = cpw.checkToken(c);
 			} catch (SQLException e) {
-				ServerGUI.print("if exception is \"java.sql.SQLNonTransientConnectionException: Could not send query: Last packet not finished\". Check if the SQL DB is up");
+				ServerGUI.print(
+						"if exception is \"java.sql.SQLNonTransientConnectionException: Could not send query: Last packet not finished\". Check if the SQL DB is up");
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			c = null;
 //		ServerGUI.print("checking version; " + Version.VERSION + '\n');
 //		ServerGUI.print("SessionID; " + sessionID + '\n');
-
+			ServerGUI.print("Optional sessionID is " + sessionID.isPresent());
 			if (sessionID.isPresent()) {
-				ServerGUI.print(" Correct token ");
 				output.writeUTF("Correct Token");
+				ServerGUI.print("sending \"Correct token\"");
 				output.flush();
 				return sessionID;
 			} else {
 				output.writeUTF("Wrong token");
+				ServerGUI.print("sending \"wrong token\"");
 				output.flush();
-				ServerGUI.print(" wrong token");
 				return Optional.empty();
 
 			}
 		}
 
-		private Optional<Integer> checkPW(DataInputStream input, DataOutputStream output) throws IOException {
+		private Optional<Long> checkPW(DataInputStream input, DataOutputStream output) throws IOException {
+			ServerGUI.print("in checkPW()");
 			ConnectionToDB conn = ConnectionToDB.createConn();
 			CheckPW cpw = new CheckPW(conn);
 			String username = input.readUTF();
+			ServerGUI.print("username is " + username);
 			int length = input.readInt();
 			char[] c = new char[length];
+			String deleteThis = "";
 			for (int i = 0; i < length; i++) {
 				c[i] = input.readChar();
 //						ServerGUI.print(""+c[i]);
+				deleteThis += c[i];
+			}
+			ServerGUI.print("PW is " + deleteThis);
+			
+			//send back correct PW
+			//send back new token
+			String token = null;
+			Optional<Long> sessionID = Optional.ofNullable(null);
+			try {
+				sessionID = cpw.checkPassword(username,c);
+				token = cpw.getToken(sessionID.get());
+				
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(sessionID.isPresent()&&!token.isEmpty()) {
+				output.writeUTF("Correct pw");
+				output.writeUTF(token);			
+			} else {
+				output.writeUTF("wrong pw");
 			}
 
 			// TODO Auto-generated method stub
-			return null;
+			return sessionID;
 		}
 
-		private void saveMeasurement(Optional<Integer> sessionID, ObjectInputStream inputFromClient)
+		private void saveMeasurement(Optional<Long> sessionID, ObjectInputStream inputFromClient)
 				throws ClassNotFoundException, IOException {
 			if (sessionID.isPresent()) {
 				ServerGUI.print(threadName + " reading object");

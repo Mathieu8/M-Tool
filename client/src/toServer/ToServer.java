@@ -33,24 +33,24 @@ public class ToServer {
 //	private DataInputStream input = null;
 
 	public ToServer() {
-		
+
 	}
 
 	/**
 	 * 
 	 * @param o - object that will be send to the server
 	 */
-	private void sendObject( Object o) {
+	private void sendObject(Object o) {
 		GUI.print("");
 		GUI.print("in sendObject()");
 		GUI.print("");
 
-		try(Socket socket = new Socket(host, 8002);
+		try (Socket socket = new Socket(host, 8002);
 				Socket objectSocket = new Socket(host, 8001);
 				ObjectOutputStream objectToServer = new ObjectOutputStream(objectSocket.getOutputStream());
 				DataOutputStream token = new DataOutputStream(socket.getOutputStream());
-				DataInputStream input = new DataInputStream(socket.getInputStream())){
-		
+				DataInputStream input = new DataInputStream(socket.getInputStream())) {
+
 			boolean test = sendToken(token, input);
 //			GUI.print("sendToken(token, input) = " + test);
 			if (test) {
@@ -65,7 +65,7 @@ public class ToServer {
 				GUI.print(o.toString());
 				objectToServer.writeObject(o);
 				objectToServer.flush();
-				
+
 				Thread.sleep(100);
 				GUI.print("sending option = \"Close\" ");
 				token.writeUTF("Close");
@@ -82,13 +82,13 @@ public class ToServer {
 	}
 
 	protected boolean sendToken() {
-		try(Socket socket = new Socket(host, 8002);
+		try (Socket socket = new Socket(host, 8002);
 				Socket objectSocket = new Socket(host, 8001);
 				ObjectOutputStream objectToServer = new ObjectOutputStream(objectSocket.getOutputStream());
 				DataOutputStream token = new DataOutputStream(socket.getOutputStream());
-				DataInputStream input = new DataInputStream(socket.getInputStream())){
-			
-			return sendToken(token,input);
+				DataInputStream input = new DataInputStream(socket.getInputStream())) {
+
+			return sendToken(token, input);
 		} catch (IOException | InterruptedException e) {
 			System.out.println("error");
 			e.printStackTrace();
@@ -98,7 +98,7 @@ public class ToServer {
 		}
 		return false;
 	}
-	
+
 	private boolean sendToken(DataOutputStream token, DataInputStream input) throws IOException, InterruptedException {
 
 		Login login = Login.loginEntry();
@@ -108,7 +108,7 @@ public class ToServer {
 
 		System.out.println("sending option = \"Token\"");
 		token.writeUTF("Token");
-		token.flush();
+//		token.flush();
 		System.out.println("sended option = \"Token\"");
 
 		Thread.sleep(10);
@@ -119,19 +119,20 @@ public class ToServer {
 			token.writeChar(c);
 		}
 
-		token.flush();
-		
+//		token.flush();
+
 		System.out.println("sended token");
 		Thread.sleep(10);
 		token.writeUTF(meta[1]);
 		token.flush();
-		
+
 		tkn = null;
 		login = null;
 
 		System.out.println("waiting for conformation of the token");
 
 		String temp = input.readUTF();
+		System.out.println("temp is " + temp);
 		if (temp.equals("Correct Token")) {
 			System.out.println("temp = " + temp);
 			return true;
@@ -140,50 +141,57 @@ public class ToServer {
 			return false;
 		}
 	}
-	
-	
 
-	public boolean SendPW(String User, char[] pw) {
+	public boolean sendPW(String User, char[] pw){
+		System.out.println("in sendPW()");
 		try (Socket socket = new Socket(host, 8002);
+				Socket objectSocket = new Socket(host, 8001);
+				ObjectOutputStream objectToServer = new ObjectOutputStream(objectSocket.getOutputStream());
 				DataOutputStream token = new DataOutputStream(socket.getOutputStream());
-				DataInputStream input = new DataInputStream(socket.getInputStream())){
+				DataInputStream input = new DataInputStream(socket.getInputStream())) {
 			
+			System.out.println("sending option = \"Password\"");
+			token.writeUTF("Password");
+//			token.flush();
+			System.out.println("sended option = \"Password\"");
 
+			System.out.println("sending user");
 			token.writeUTF(User);
+			System.out.println("sending PW");
 			token.writeInt(pw.length);
 			CharBuffer.wrap(pw).chars().forEach(i -> {
-				try {
-					token.writeChar(i);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+					try {
+						token.writeChar(i);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
 			});
 
-			for (char c : pw) {
-				token.writeChar(c);
-				Platform.runLater(() -> {
-					GUI.welcome.appendText("" + c);
-				});
-			}
-			GUI.print("\n");
-
-			// token.writeUTF(s.toString());
 			token.flush();
 			pw = null;
 
+			Thread.sleep(10);
+			System.out.println("waiting for conformation");
 			String temp = input.readUTF();
-			if (temp.equals("Correct Token")) {
-				GUI.print("Correct Token " + temp + '\n');
+			if (temp.equals("Correct pw")) {
+				System.out.println("Correct pw " + temp + '\n');
+				String t = input.readUTF();
+				Token tkn = new Token();
+				tkn.deleteFile();
+				tkn.createFile(t);
 				return true;
 			} else {
-				GUI.print(" incorrect Token " + temp + '\n');
+				System.out.println(" incorrect pw " + temp + '\n');
 				return false;
 
 			}
 		} catch (IOException e) {
 //			System.out.println("error");
 			// e.printStackTrace();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 		return false;
 	}
