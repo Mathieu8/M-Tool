@@ -16,9 +16,11 @@ import src.login.Login;
 import src.login.LoginGUI;
 
 public class WelcomeGUI extends Application {
-	private static Login login = null;
-	boolean loginValid = false;
-	Timeline fiveSecondsWonder;
+	private static Stage STAGE;
+	private Login login = null;
+	private boolean loginValid = false;
+	private boolean firstTime = true;
+	private Timeline secondsWonder;
 	
 
 	public boolean isLoginValid() {
@@ -28,10 +30,15 @@ public class WelcomeGUI extends Application {
 	public void setLoginValid(boolean loginValid) {
 		this.loginValid = loginValid;
 	}
-
+	
+	
+	
+	
+	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		TextArea welcome = new TextArea("Welcome to the app");
+		STAGE = primaryStage;
 
 		StackPane root = new StackPane();
 		root.getChildren().addAll(welcome);
@@ -45,36 +52,42 @@ public class WelcomeGUI extends Application {
 
 		Duration d = Duration.seconds(1); // seconds for testing
 
-		fiveSecondsWonder = new Timeline(new KeyFrame(d, new EventHandler<ActionEvent>() {
+		secondsWonder = new Timeline(new KeyFrame(d, new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("in TimeLine( in KeyFrame( handle )) ");
+				System.out.println("LoginValid = " + loginValid);
 
 				if (loginValid) {
 					GUI gui = new GUI();
 					gui.initialize();
 					gui.showStage();
-					fiveSecondsWonder.stop();
+					secondsWonder.stop();
 					primaryStage.hide();
 					
-				} else {
+				} else if(firstTime) {
 //					GUI gui = new GUI();
 //					gui.initialize();
 //					gui.showStage();
 //					fiveSecondsWonder.stop();
 //					primaryStage.hide();
-					fiveSecondsWonder.pause();
 					loginValid = Login.loginEntry().tokenValid();
+					firstTime = false;
+					
+				} else {
+					secondsWonder.pause();
 					LoginGUI login = new LoginGUI();
 					login.initialize();
 					login.show();
-					//test that PW is correct, if so show gui
+					
 				}
+				//test that PW is correct, if so show gui
+				
 			}
 		}));
-		fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
-		fiveSecondsWonder.play();
+		secondsWonder.setCycleCount(Timeline.INDEFINITE);
+		secondsWonder.play();
 
 		// TODO Auto-generated method stub
 
@@ -86,7 +99,13 @@ public class WelcomeGUI extends Application {
 
 	public WelcomeGUI() {
 		login = Login.loginEntry();
-//		loginValid = login.tokenValid();
+		loginValid = login.tokenValid();
+	}
+
+	public static void hideStage() {
+		STAGE.hide();
+		// TODO Auto-generated method stub
+		
 	}
 
 }

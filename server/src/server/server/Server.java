@@ -11,6 +11,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
 
@@ -32,7 +33,6 @@ import version.Version;
  *
  */
 public class Server {
-
 	// Number a client
 	private int clientNo = 0;
 
@@ -84,7 +84,7 @@ public class Server {
 	class HandleAClient implements Runnable {
 		private Socket socket; // A connected socket
 		private Socket objectSocket; // A connected socket
-		final ConnectionToDB conn = ConnectionToDB.createConn();
+		
 		String threadName;
 
 		/**
@@ -102,7 +102,7 @@ public class Server {
 
 		/** Run a thread */
 		public void run() {
-			threadName = Thread.currentThread().getName();
+			ServerOptions options= new ServerOptions();
 			ServerGUI.print(threadName + " in run()");
 //			 ConnectionToDB.createConn();
 //			ServerGUI.print("after ConnectionToDB.createConn()");
@@ -124,15 +124,20 @@ public class Server {
 					switch (option) {
 					case "Token":
 						ServerGUI.print(threadName + " in token");
-						sessionID = checkToken(input, output);
+						sessionID = options.checkToken(input, output);
 						break;
 					case "Password":
 						ServerGUI.print(threadName + " in password");
-						sessionID = checkPW(input, output);
+						sessionID = options.checkPW(input, output);
 						break;
 					case "BasicMeasurements":
 						ServerGUI.print(threadName + " in measurements");
-						saveMeasurement(sessionID, inputFromClient);
+						options.saveMeasurement(sessionID, inputFromClient);
+//						break outer;
+						break;
+					case "sendNewAccount":
+						ServerGUI.print(threadName + " in sendNewAccount");
+						sessionID = options.sendNewAccount(input, output);
 //						break outer;
 						break;
 					case "Close":
@@ -155,104 +160,8 @@ public class Server {
 			}
 		}
 
-		private Optional<Long> checkToken(DataInputStream input, DataOutputStream output) throws IOException {
-			ServerGUI.print("In CheckToken");
-			ConnectionToDB conn = ConnectionToDB.createConn();
-			CheckPW cpw = new CheckPW(conn);
-			var temp = "";
-			int length = input.readInt();
-			char[] c = new char[length];
-			for (int i = 0; i < length; i++) {
-				c[i] = input.readChar();
-				temp += c[i];
-			}
-			ServerGUI.print("Token is <" + temp + ">");
-			String date = input.readUTF();
-			ServerGUI.print("date is " + date);
+		
 
-			Optional<Long> sessionID = Optional.ofNullable(null);
-			try {
-				sessionID = cpw.checkToken(c);
-			} catch (SQLException e) {
-				ServerGUI.print(
-						"if exception is \"java.sql.SQLNonTransientConnectionException: Could not send query: Last packet not finished\". Check if the SQL DB is up");
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			c = null;
-//		ServerGUI.print("checking version; " + Version.VERSION + '\n');
-//		ServerGUI.print("SessionID; " + sessionID + '\n');
-			ServerGUI.print("Optional sessionID is " + sessionID.isPresent());
-			if (sessionID.isPresent()) {
-				output.writeUTF("Correct Token");
-				ServerGUI.print("sending \"Correct token\"");
-				output.flush();
-				return sessionID;
-			} else {
-				output.writeUTF("Wrong token");
-				ServerGUI.print("sending \"wrong token\"");
-				output.flush();
-				return Optional.empty();
-
-			}
-		}
-
-		private Optional<Long> checkPW(DataInputStream input, DataOutputStream output) throws IOException {
-			ServerGUI.print("in checkPW()");
-			ConnectionToDB conn = ConnectionToDB.createConn();
-			CheckPW cpw = new CheckPW(conn);
-			String username = input.readUTF();
-			ServerGUI.print("username is " + username);
-			int length = input.readInt();
-			char[] c = new char[length];
-			String deleteThis = "";
-			for (int i = 0; i < length; i++) {
-				c[i] = input.readChar();
-//						ServerGUI.print(""+c[i]);
-				deleteThis += c[i];
-			}
-			ServerGUI.print("PW is " + deleteThis);
-			
-			//send back correct PW
-			//send back new token
-			String token = null;
-			Optional<Long> sessionID = Optional.ofNullable(null);
-			try {
-				sessionID = cpw.checkPassword(username,c);
-				token = cpw.getToken(sessionID.get());
-				
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			if(sessionID.isPresent()&&!token.isEmpty()) {
-				output.writeUTF("Correct pw");
-				output.writeUTF(token);			
-			} else {
-				output.writeUTF("wrong pw");
-			}
-
-			// TODO Auto-generated method stub
-			return sessionID;
-		}
-
-		private void saveMeasurement(Optional<Long> sessionID, ObjectInputStream inputFromClient)
-				throws ClassNotFoundException, IOException {
-			if (sessionID.isPresent()) {
-				ServerGUI.print(threadName + " reading object");
-				// Continuously serve the client
-				BasicMeasurements object = (BasicMeasurements) inputFromClient.readObject();
-				ServerGUI.print(threadName + " read object");
-
-				ServerGUI.print(threadName + " TableName received from client: " + object.getTableName());
-				ServerGUI.print(threadName + " first item in the data set: " + object.toString());
-
-				SaveMethod sm = new SaveMethod(conn);
-				sm.SaveData(object, sessionID.get());
-			} else {
-				throw new IllegalArgumentException(
-						"Optional<Ineger> sessionID is required. please make sure it pass thru the password check or token test");
-			}
-		}
+		
 	}
 }

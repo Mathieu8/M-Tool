@@ -14,9 +14,12 @@ import src.toServer.ToServer;
  * This class makes a button, that if pressed all the data will be sent to the
  * server to be handled
  * 
- * <br><br><b> TODO</b> this class should implement Buttons interface.
+ * <br>
+ * <br>
+ * <b> TODO</b> this class should implement Buttons interface.
+ * 
  * @author mathieu
- *  @version 09/27/2018
+ * @version 09/27/2018
  */
 
 public class SaveBtn {
@@ -24,7 +27,6 @@ public class SaveBtn {
 	MeasurmentGUI gui;
 	String text = "save";
 	String tooltip = "save";
-
 
 	/**
 	 * @return Button
@@ -70,8 +72,6 @@ public class SaveBtn {
 		ToServer.sendToServer(obj);
 		MeasurmentGUI.stage.hide();
 	}
-	
-	
 
 	/**
 	 * @param o - object that will be later passed on to the server
@@ -79,7 +79,5 @@ public class SaveBtn {
 	public void setObject(BasicMeasurements o) {
 		obj = o;
 	}
-
-	
 
 }

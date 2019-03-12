@@ -48,20 +48,13 @@ public class Login extends ToServer {
 	public boolean tokenValid() {
 		boolean temp = false;
 		System.out.println("in tokenValid()");
-		
-		
 
-			if (sendToken()) {
-				System.out.println("Token valid ");
-				temp = true;
-			} else {
-				System.out.println("Token invalid ");
-//				new LoginGUI().show();
-				temp = false;
-			}
-			
-			
-		return temp;
-//		return true;
+		if (sendToken()) {
+			System.out.println("Token valid ");
+			return true;
+		} else {
+			System.out.println("Token invalid ");
+			return false;
+		}
 	}
 }

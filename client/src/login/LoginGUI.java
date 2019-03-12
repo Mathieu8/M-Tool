@@ -17,7 +17,6 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 
@@ -29,12 +28,13 @@ import src.gui.WelcomeGUI;
 import src.toServer.ToServer;
 
 public class LoginGUI {
-	String Username;
-	char[] pw;
-	Stage stage;
-	static int counter = 0;
+	private String Username;
+	private static int counter = 0;
+	private Stage stage;
+	private Scene scene;
 
-	public Stage initialize() {
+	public void initialize() {
+		char[] pw;
 		if (stage == null) {
 			stage = new Stage();
 			stage.setTitle("JavaFX 2 Login");
@@ -54,6 +54,7 @@ public class LoginGUI {
 			Label lblPassword = new Label("Password");
 			final PasswordField pf = new PasswordField();
 			Button btnLogin = new Button("Login");
+			Button btnNewUser = new Button("New User");
 			final Label lblMessage = new Label();
 			// Adding Nodes to GridPane layout
 			gridPane.add(lblUserName, 0, 0);
@@ -61,6 +62,7 @@ public class LoginGUI {
 			gridPane.add(lblPassword, 0, 1);
 			gridPane.add(pf, 1, 1);
 			gridPane.add(btnLogin, 2, 1);
+			gridPane.add(btnNewUser, 0, 3);
 			gridPane.add(lblMessage, 1, 2);
 			// Reflection for gridPane
 			Reflection r = new Reflection();
@@ -92,15 +94,17 @@ public class LoginGUI {
 					gui.showStage();
 //						fiveSecondsWonder.stop();
 					stage.hide();
+					
 				}
 			}));
+
 			EventHandler<ActionEvent> buttonHandler = new EventHandler<ActionEvent>() {
 				@Override
 				public void handle(ActionEvent event) {
 					System.out.println("in actionhandler");
 					String userName = txtUserName.getText().toString();
 //					String checkPw = pf.getText().toString();
-					pw = pf.getText().toCharArray();
+					char[] pw = pf.getText().toCharArray();
 
 					boolean temp = new ToServer().sendPW(userName, pw);
 					if (temp) {
@@ -109,7 +113,7 @@ public class LoginGUI {
 
 						lblMessage.setTextFill(Color.GREEN);
 						twoSecondsWonder.play();
-
+						WelcomeGUI.hideStage();
 
 					} else {
 						lblMessage.setText("Incorrect user or pw.");
@@ -120,14 +124,20 @@ public class LoginGUI {
 
 					event.consume();
 				}
-
 			};
 			btnLogin.setOnAction(buttonHandler);
+			EventHandler<ActionEvent> newUser = new EventHandler<ActionEvent>() {
+				@Override
+				public void handle(ActionEvent event) {
+					new NewUserGUI().newUser(stage);
+				}
+			};
+			btnNewUser.setOnAction(newUser);
 			// Add HBox and GridPane layout to BorderPane Layout
 			bp.setTop(hb);
 			bp.setCenter(gridPane);
 			// Adding BorderPane to the scene and loading CSS
-			Scene scene = new Scene(bp);
+			scene = new Scene(bp);
 //			scene.getStylesheets().add(getClass().getClassLoader().getResource("login.css").toExternalForm());
 			stage.setScene(scene);
 			stage.titleProperty()
@@ -142,7 +152,7 @@ public class LoginGUI {
 
 			});
 		}
-		return stage;
+//		return stage;
 	}
 
 	public void show() {
@@ -151,6 +161,8 @@ public class LoginGUI {
 			counter = 1;
 		}
 	}
+
+
 
 //	@Override
 //	public void start(Stage primaryStage) throws Exception {

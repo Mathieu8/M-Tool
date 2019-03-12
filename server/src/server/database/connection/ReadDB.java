@@ -40,6 +40,7 @@ public interface ReadDB extends PassConnection{
 //			ResultSet rs = st.getGeneratedKeys();
 
 			int i = 1;
+			rs.beforeFirst();
 			while (rs.next()) {
 				list.add(rs.getInt(i++));
 			}
