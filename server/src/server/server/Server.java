@@ -128,7 +128,7 @@ public class Server {
 						break;
 					case "Password":
 						ServerGUI.print(threadName + " in password");
-						sessionID = options.checkPW(input, output);
+						sessionID = options.checkPW(input, output, socket.getInetAddress().getHostAddress());
 						break;
 					case "BasicMeasurements":
 						ServerGUI.print(threadName + " in measurements");
@@ -139,6 +139,10 @@ public class Server {
 						ServerGUI.print(threadName + " in sendNewAccount");
 						sessionID = options.sendNewAccount(input, output);
 //						break outer;
+						break;
+					case "ChangePW":
+						options.changePW(input,output,sessionID.get());
+						
 						break;
 					case "Close":
 					default:

@@ -103,6 +103,9 @@ public class LoginGUI {
 				public void handle(ActionEvent event) {
 					System.out.println("in actionhandler");
 					String userName = txtUserName.getText().toString();
+					
+					User.setUserName(userName);
+					
 //					String checkPw = pf.getText().toString();
 					char[] pw = pf.getText().toCharArray();
 
@@ -113,6 +116,7 @@ public class LoginGUI {
 
 						lblMessage.setTextFill(Color.GREEN);
 						twoSecondsWonder.play();
+						resetCounter();
 						WelcomeGUI.hideStage();
 
 					} else {
@@ -160,6 +164,10 @@ public class LoginGUI {
 			stage.show();
 			counter = 1;
 		}
+	}
+	
+	void resetCounter() {
+		counter =0;
 	}
 
 

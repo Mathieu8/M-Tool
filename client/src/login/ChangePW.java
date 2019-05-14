@@ -1,4 +1,3 @@
-
 package src.login;
 
 import java.util.Arrays;
@@ -29,7 +28,8 @@ import src.gui.GUI;
 import src.gui.WelcomeGUI;
 import src.toServer.ToServer;
 
-public class NewUserGUI {
+public class ChangePW {
+
 	public void newUser(Stage stage) {
 		BorderPane bp = new BorderPane();
 		bp.setPadding(new Insets(0, 50, 50, 50));
@@ -42,9 +42,9 @@ public class NewUserGUI {
 		gridPane.setHgap(5);
 		gridPane.setVgap(5);
 		// Implementing Nodes for GridPane
-		Label lblUserName = new Label("Username");
-		final TextField txtUserName = new TextField();
-		Label lblPassword = new Label("Password");
+		Label lblUserName = new Label("Old Password");
+		final PasswordField oldPW = new PasswordField();
+		Label lblPassword = new Label("New Password");
 		final PasswordField pf = new PasswordField();
 		Label lblPassword2 = new Label("Repeat Password");
 		final PasswordField pf2 = new PasswordField();
@@ -52,9 +52,9 @@ public class NewUserGUI {
 		final Label lblMessage = new Label();
 		// Adding Nodes to GridPane layout
 		VBox fields = new VBox();
-		
+
 		gridPane.add(lblUserName, 0, 0);
-		gridPane.add(txtUserName, 1, 0);
+		gridPane.add(oldPW, 1, 0);
 		gridPane.add(lblPassword, 0, 1);
 		gridPane.add(pf, 1, 1);
 		gridPane.add(lblPassword2, 0, 2);
@@ -62,7 +62,7 @@ public class NewUserGUI {
 		gridPane.add(btnLogin, 3, 2);
 		fields.getChildren().add(gridPane);
 		fields.getChildren().add(lblMessage);
-//		gridPane.add(lblMessage, 2, 3);
+//			gridPane.add(lblMessage, 2, 3);
 		// Reflection for gridPane
 		Reflection r = new Reflection();
 		r.setFraction(0.7f);
@@ -84,26 +84,24 @@ public class NewUserGUI {
 		btnLogin.setDefaultButton(true);
 		text.setId("text");
 		// Action for btnLogin
-		
+
 		EventHandler<ActionEvent> buttonHandler = new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("in actionhandler");
-				String userName = txtUserName.getText().toString();
+				char[] userName = oldPW.getText().toCharArray();
 				String temp = null;
-//				String checkPw = pf.getText().toString();
+//					String checkPw = pf.getText().toString();
 				char[] pw = pf.getText().toCharArray();
 				char[] pw2 = pf2.getText().toCharArray();
-				
-				if (!userName.contains("@ict-stadsbrug.nl")) {
-					temp = "use a ict-stadsbrug email adress during testing";
-				} else if (Arrays.equals(pw, null) || Arrays.equals(pw2, null)) {
+
+				if (Arrays.equals(pw, null) || Arrays.equals(pw2, null)) {
 					temp = "insert all the fields";
 				} else {
-					temp = new ToServer().sendNewAccount(userName, pw, pw2);
+					temp = new ToServer().sendChangePW(userName, pw, pw2);
 				}
 				System.out.println(temp);
-				
+
 				switch (temp) {
 				case "different pw's":
 					lblMessage.setText("Make sure passwords are identical");
@@ -111,10 +109,6 @@ public class NewUserGUI {
 					break;
 				case "username allready taken":
 					lblMessage.setText("Email is allready in use");
-					lblMessage.setTextFill(Color.RED);
-					break;
-				case "use a ict-stadsbrug email adress during testing":
-					lblMessage.setText(temp);
 					lblMessage.setTextFill(Color.RED);
 					break;
 				case "Welcome":
@@ -127,42 +121,42 @@ public class NewUserGUI {
 							GUI gui = new GUI();
 							gui.initialize();
 							gui.showStage();
-//								fiveSecondsWonder.stop();
+//									fiveSecondsWonder.stop();
 							new WelcomeGUI().setLoginValid(true);
 							stage.hide();
 						}
 					}));
-					
+
 					break;
 				default:
 					lblMessage.setText("error " + temp);
 					lblMessage.setTextFill(Color.RED);
 				}
-//				if (temp) {
-//					new WelcomeGUI().setLoginValid(temp);
-//					lblMessage.setText("Congratulations!");
-//
-//					lblMessage.setTextFill(Color.GREEN);
-//
-//				} else {
-//					lblMessage.setText("Incorrect user or pw.");
-//					lblMessage.setTextFill(Color.RED);
-//				}
-				txtUserName.setText("");
+//					if (temp) {
+//						new WelcomeGUI().setLoginValid(temp);
+//						lblMessage.setText("Congratulations!");
+				//
+//						lblMessage.setTextFill(Color.GREEN);
+				//
+//					} else {
+//						lblMessage.setText("Incorrect user or pw.");
+//						lblMessage.setTextFill(Color.RED);
+//					}
+				oldPW.setText("");
 				pf.setText("");
 				pf2.setText("");
-				
+
 				event.consume();
 			}
-			
+
 		};
 		btnLogin.setOnAction(buttonHandler);
 		// Add HBox and GridPane layout to BorderPane Layout
 		bp.setTop(hb);
 		bp.setCenter(fields);
-		
+
 		Scene scene = new Scene(bp);
 		stage.setScene(scene);
-		
+
 	}
 }

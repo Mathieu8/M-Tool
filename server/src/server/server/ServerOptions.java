@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.nio.CharBuffer;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.stream.Collector;
@@ -17,11 +19,13 @@ import java.util.stream.Stream;
 
 import measurements.BasicMeasurements;
 import src.server.database.CheckPW;
+import src.server.database.ReturnObject;
 import src.server.database.SaveMethod;
 import src.server.database.connection.ConnectionToDB;
 
 public class ServerOptions {
 	final ConnectionToDB conn = ConnectionToDB.createConn();
+	Warnings warnings = new Warnings();
 
 	private char[] readArray(DataInputStream input) throws IOException {
 		int length = input.readInt();
@@ -63,15 +67,22 @@ public class ServerOptions {
 		// send back new token
 		String token = null;
 		try {
+			ReturnObject returnObject = cpw.newUser(username, pw);
+			warnings.warning(input, output, returnObject);
 
-			String massage = cpw.newUser(username, pw);
+			String massage = returnObject.getMessage();
+			sessionID = returnObject.getSessionID();
 			ServerGUI.print("Massage is " + massage);
-			if (massage.equals("username allready taken")) {
+			ServerGUI.print("!sessionID.isPresent() " + !sessionID.isPresent());
+//			ServerGUI.print("sessionID.get() " + sessionID.get());
+
+			if (!sessionID.isPresent()) {
+				ServerGUI.print("Massage is " + massage);
+
 				output.writeUTF(massage);
 				return Optional.ofNullable(null);
 			} else {
-				sessionID = Optional.of(Long.valueOf(massage));
-				ServerGUI.print("Long value of massage " + Long.valueOf(massage));
+				ServerGUI.print("sessionID " + sessionID.get());
 
 //			sessionID = cpw.checkPassword(username, pw);
 				token = cpw.getToken(sessionID.get());
@@ -111,7 +122,10 @@ public class ServerOptions {
 
 		Optional<Long> sessionID = Optional.ofNullable(null);
 		try {
-			sessionID = cpw.checkToken(token);
+			ReturnObject returnObject = cpw.checkToken(token);
+			warnings.warning(input, output, returnObject);
+			sessionID = returnObject.getSessionID();
+
 		} catch (SQLException e) {
 			ServerGUI.print(
 					"if exception is \"java.sql.SQLNonTransientConnectionException: Could not send query: Last packet not finished\". Check if the SQL DB is up");
@@ -132,9 +146,10 @@ public class ServerOptions {
 			return Optional.empty();
 
 		}
+
 	}
 
-	Optional<Long> checkPW(DataInputStream input, DataOutputStream output) throws IOException {
+	Optional<Long> checkPW(DataInputStream input, DataOutputStream output, String ipAddress) throws IOException {
 		ServerGUI.print("in checkPW()");
 		ConnectionToDB conn = ConnectionToDB.createConn();
 		CheckPW cpw = new CheckPW(conn);
@@ -153,9 +168,13 @@ public class ServerOptions {
 		String token = null;
 		Optional<Long> sessionID = Optional.ofNullable(null);
 		try {
-			sessionID = cpw.checkPassword(username, pw);
-			token = cpw.getToken(sessionID.get());
-
+			ReturnObject returnObject = cpw.checkPassword(ipAddress ,username, pw);
+			warnings.warning(input, output, returnObject);
+			sessionID = returnObject.getSessionID();
+			ServerGUI.print("SessionID " + sessionID);
+			if (sessionID.isPresent()) {
+				token = cpw.getToken(sessionID.get());
+			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -188,6 +207,19 @@ public class ServerOptions {
 			throw new IllegalArgumentException(
 					"Optional<Ineger> sessionID is required. please make sure it pass thru the password check or token test");
 		}
+	}
+
+	public void changePW(DataInputStream input, DataOutputStream output, long sessionID) throws IOException {
+		char[] oldPW = readArray(input);
+		char[] pw = readArray(input);
+		char[] pw2 = readArray(input);
+
+		boolean equal = Arrays.equals(pw, pw2);
+		ServerGUI.print("pw equals pw2 is " + equal);
+		if (!equal) {
+			output.writeUTF("different pw's");
+		}
+
 	}
 
 }

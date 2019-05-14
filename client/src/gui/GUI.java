@@ -9,6 +9,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
@@ -17,6 +18,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import src.gui.elements.Buttons;
 import src.gui.measurementGUI.MeasurmentGUI;
+import src.gui.menu.MBar;
 import src.login.Login;
 
 /**
@@ -31,58 +33,11 @@ import src.login.Login;
  * @version 09/27/2018
  *
  */
-public class GUI extends Application implements Buttons {
+public class GUI  {
 	static MeasurmentGUI measurment;
 	static Stage measurmentGUI;
 	static Stage main = null;
 	public static TextArea welcome;
-	
-
-	@Override
-	public void start(Stage primaryStage) throws Exception {
-		welcome = new TextArea();
-		measurment = new MeasurmentGUI();
-		// Label welcome = new Label("Welcome");
-
-		primaryStage.setTitle("Self Management Tool");
-		Platform.setImplicitExit(false);
-		String test = "test";
-		StackPane root = new StackPane();
-		HBox btn = new HBox();
-		btn.getChildren().add(buttons(test, test));
-		VBox vb = new VBox();
-		vb.getChildren().addAll(btn, welcome);
-		root.getChildren().addAll(vb);
-
-		Scene scene = new Scene(root, 300, 250);
-
-		primaryStage.setScene(scene);
-		primaryStage.show();
-
-		Duration d = Duration.seconds(5); // seconds for testing
-		// d.add(Duration.minutes(50)); // minutes for use
-//				Duration.INDEFINITE; // so it never launches during testing
-		measurmentGUI = measurment.initialized();
-
-//		Login.loginEntry().tokenValid();
-
-		Timeline fiveSecondsWonder = new Timeline(new KeyFrame(d, new EventHandler<ActionEvent>() {
-
-			@Override
-			public void handle(ActionEvent event) {
-				Platform.runLater(() -> {
-					welcome.appendText("this is called every " + d + " on UI thread" + '\n');
-				});
-				measurment.setUID(1);
-				measurment.reset(1);
-
-				measurmentGUI.show();
-			}
-		}));
-		fiveSecondsWonder.setCycleCount(Timeline.INDEFINITE);
-		fiveSecondsWonder.play();
-
-	}
 
 	public Stage initialize() {
 		if (main == null) {
@@ -92,12 +47,12 @@ public class GUI extends Application implements Buttons {
 			// Label welcome = new Label("Welcome");
 
 			Platform.setImplicitExit(false);
-			String test = "test";
+//			String test = "test";
 			StackPane root = new StackPane();
-			HBox btn = new HBox();
-			btn.getChildren().add(buttons(test, test));
+			MenuBar menuBar = new MBar().getMenuBar();
 			VBox vb = new VBox();
-			vb.getChildren().addAll(btn, welcome);
+			
+			vb.getChildren().addAll(menuBar , welcome);
 			root.getChildren().addAll(vb);
 
 			Scene scene = new Scene(root, 300, 250);
@@ -133,22 +88,9 @@ public class GUI extends Application implements Buttons {
 	public void showStage() {
 		main.show();
 	}
-
-	public void startGUI(String[] args) {
-		Application.launch(args);
-	}
-
-	@Override
-	public void actionButton(String text) {
-		// TODO Auto-generated method stub
-		measurment.setUID(1);
-		measurment.reset(1);
-
-		measurmentGUI.show();
-	}
-
-	boolean checkLogin() {
-		return false;
+	
+	public static void hideStage() {
+		main.hide();
 	}
 
 	public static void print(String s) {

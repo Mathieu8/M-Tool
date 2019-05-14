@@ -10,7 +10,7 @@ import java.util.List;
 
 import src.server.server.ServerGUI;
 
-public interface ReadDB extends PassConnection{
+public interface ReadDB extends PassConnection {
 
 	public default List<String> readStringDB(String query) throws SQLException {
 		List<String> list = new ArrayList<String>();
@@ -57,8 +57,8 @@ public interface ReadDB extends PassConnection{
 //		if (rs.next()) {
 //			UID = rs.getInt(1);
 	}
-	
-	public default List<Long> readLongDB(String query) throws SQLException{
+
+	public default List<Long> readLongDB(String query) throws SQLException {
 		List<Long> list = new ArrayList<Long>();
 		if (checkConn()) {
 			Statement st = getConnection().prepareStatement(query);
@@ -73,6 +73,5 @@ public interface ReadDB extends PassConnection{
 		}
 		return list;
 	}
-
 
 }
