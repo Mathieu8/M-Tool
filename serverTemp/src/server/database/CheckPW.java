@@ -202,7 +202,7 @@ public class CheckPW {
 					hashedPasswordData.getHashedAlgorithm() };
 			conn.createDB("users", fields, data);
 
-			return checkPassword(user, pw);
+			return checkPassword("", user, pw);
 		} else {
 			returnObject.setMessage("username allready taken");
 		}
